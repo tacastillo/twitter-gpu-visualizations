@@ -1,0 +1,70 @@
+@import url(http://fonts.googleapis.com/css?family=Wire+One);
+
+body {
+  font-family: "Wire One";
+  margin: auto;
+  position: relative;
+  padding: 20px;
+  height: 100%;
+  background-color: #FFFFFF;
+}
+
+form {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.node {
+  border: solid 1px white;
+  line-height: 0.95;
+  overflow: hidden;
+  position: absolute;
+  border-radius: 6px;
+  background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,.3), hsla(0,0%,100%,0));
+  background-image: -moz-linear-gradient(top, hsla(0,0%,100%,.3), hsla(0,0%,100%,0));
+  background-image: -ms-linear-gradient(top, hsla(0,0%,100%,.3), hsla(0,0%,100%,0));
+  background-image: -o-linear-gradient(top, hsla(0,0%,100%,.3), hsla(0,0%,100%,0));
+  background-image: linear-gradient(top, hsla(0,0%,100%,.3), hsla(0,0%,100%,0));
+  text-shadow: -1px -1px 2px hsla(0,0%,100%,0.25),
+        -1px -1px 2px hsla(0,0%,100%,0.25),
+        -1px 1px 2px hsla(0,0%,100%,0.25),
+        1px -1px 2px hsla(0,0%,100%,0.25),
+        -1px 0px 2px hsla(0,0%,100%,0.25),
+        1px 0px 2px hsla(0,0%,100%,0.25);
+}
+
+.node div {
+  padding: 6px 4%;
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+}
+
+.controls button {
+  width: 100px;
+  height: 20px;
+  margin: 1px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: "Arial";
+  color: #333333;
+  border-radius: 2px;
+  background-color: #FFFFFF;
+  border: 1px solid #999999;
+}
+
+.instructions {
+  position: relative;
+  color: #000000;
+  left: 30px;
+  top: 720px;
+  z-index: 10;
+  font-size: 11px;
+  font-family: "Arial";
+  color: #777777;
+}
