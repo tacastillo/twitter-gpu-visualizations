@@ -9,9 +9,12 @@ var connection = mysql.createConnection({
     password: 'kinevote2016',
     database: 'KineVote'
 });
+
 connection.connect();
+
+app.use(express.static('.'))
+
 app.get('/', function(req, res) {
-    res.sendfile('index.html');
     io.on('connection', function(socket) {
         console.log("Connected");
         socket.on('coachella', function(message) {
