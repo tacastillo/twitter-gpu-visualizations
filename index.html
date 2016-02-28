@@ -10,11 +10,19 @@
     <script src='http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js'></script>
     <script src='https://cdn.rawgit.com/lodash/lodash/master/lodash.js'></script>
     <script src="js/treemapmain.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <link rel="stylesheet" href="css/style.css">    
   </head>
 
   <body>
   <div class="instructions">[Drag with mouse to move/rotate; right-drag to pan]</div>
   <div id="container_JoEQyb"></div>
+  <script>
+    var socket = io();
+    socket.emit('coachella', "waddup");
+    socket.on('coachella', function(message) {
+      console.log(message);
+    })
+  </script>
   </body>
 </html>

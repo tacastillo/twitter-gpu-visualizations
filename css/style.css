@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Wire+One);
+/*@import url(http://fonts.googleapis.com/css?family=Wire+One);
 
 body {
   font-family: "Wire One";
@@ -67,4 +67,13 @@ form {
   font-size: 11px;
   font-family: "Arial";
   color: #777777;
+}*/
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
 }
