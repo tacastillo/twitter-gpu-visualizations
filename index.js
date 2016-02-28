@@ -1,20 +1,27 @@
 var express = require('express'),
-	app = express(),
-	mysql = require('mysql');
-
+    app = require('express')(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
+    mysql = require('mysql');
 var connection = mysql.createConnection({
-	host: '',
-	user: '',
-	password: '',
-	database: ''
+    host: 'kinevotedb.cjvcoatcfeke.us-west-2.rds.amazonaws.com',
+    user: 'admin',
+    password: 'kinevote2016',
+    database: 'KineVote'
 });
-
 connection.connect();
-
-connection.query('SELECT * from hashtagsLog LIMIT 500', function (err, rows, fields) {
-	if (err) {
-		console.log('Error while querying.');
-	} else {
-		console.log("Result: \n", rows);
-	}
-})
+app.get('/', function(req, res) {
+    res.sendfile('index.html');
+    io.on('connection', function(socket) {
+        console.log("Connected");
+        socket.on('coachella', function(message) {
+            console.log("YOU'VE GOT MAIL: ", message);
+            connection.query('SELECT * from hashtagsLog LIMIT 500', function(err, rows, fields) {
+            	io.emit('coachella', err ? err: rows);
+            });
+        });
+    });
+});
+http.listen(3000, function() {
+    console.log('listening on *:3000');
+});
