@@ -15,16 +15,16 @@ connection.connect();
 app.use(express.static('.'))
 
 app.get('/', function(req, res) {
-    io.on('connection', function(socket) {
-        console.log("Connected");
-        socket.on('coachella', function(message) {
-            console.log("YOU'VE GOT MAIL: ", message);
-            connection.query('SELECT * from hashtagsLog LIMIT 500', function(err, rows, fields) {
-            	io.emit('coachella', err ? err: rows);
-            });
+});
+
+io.on('connection', function(socket) {
+    socket.on('coachella', function(message) {
+        connection.query('SELECT * from hashtagsLog', function(err, rows, fields) {
+            io.emit('coachella', err ? err: rows);
         });
     });
 });
+
 http.listen(3000, function() {
     console.log('listening on *:3000');
 });
