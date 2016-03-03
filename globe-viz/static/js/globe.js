@@ -89,6 +89,8 @@ DAT.Globe = function(container, colorFn) {
   // var ROTATIONSPEED = 0.0;
   var k = ROTATIONSPEED;
   var f = false;
+  //RADIUS OF SPHERE 
+  var sphereRadius = 220;
 
   function init() {
 
@@ -105,7 +107,7 @@ DAT.Globe = function(container, colorFn) {
 
     scene = new THREE.Scene();
 
-    var geometry = new THREE.SphereGeometry(150, 40, 30);
+    var geometry = new THREE.SphereGeometry(sphereRadius, 40, 30);
 
     shader = Shaders['earth'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
@@ -213,7 +215,7 @@ DAT.Globe = function(container, colorFn) {
       lng = data[i + 1];
       color = colorFnWrapper(data,i);
       size = data[i + 2];
-      size = size*150;
+      size = size*sphereRadius;
       addPoint(lat, lng, size, color, subgeo);
     }
     if (opts.animated) {
@@ -257,9 +259,9 @@ DAT.Globe = function(container, colorFn) {
     var phi = (90 - lat) * Math.PI / 180;
     var theta = (180 - lng) * Math.PI / 180;
 
-    point.position.x = 150 * Math.sin(phi) * Math.cos(theta);
-    point.position.y = 150 * Math.cos(phi);
-    point.position.z = 150 * Math.sin(phi) * Math.sin(theta);
+    point.position.x = sphereRadius * Math.sin(phi) * Math.cos(theta);
+    point.position.y = sphereRadius * Math.cos(phi);
+    point.position.z = sphereRadius * Math.sin(phi) * Math.sin(theta);
 
     point.lookAt(mesh.position);
 

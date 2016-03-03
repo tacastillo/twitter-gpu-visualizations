@@ -4,15 +4,30 @@
     <title>WebGL Globe</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="static/css/globe.css">
+
+    <!-- General Jquery -->
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  	<!-- UI Jquery Scripts -->
+  	<script type="text/javascript" src="static/js/globeVisualizationHelper.js"></script>
 </head>
 <body>
+      <div id="currentInfo">
+<!-- 	    <span id="year1990" class="year">1990</span>
+	    <span id="year1995" class="year">1995</span>
+	    <span id="year2000" class="year">2000</span> -->
+	  </div>
+
+	  <div id="title">
+	    Tweets(By Random Filter)
+	  </div>
     <div id="container"></div>
-    
+    <!-- WebGL/Three Globe frameworks -->
     <script type="text/javascript" src="static/js/Three/Detector.js"></script>
     <script type="text/javascript" src="static/js/three.min.js"></script>
     <script type="text/javascript" src="static/js/Tween.js"></script>
     <script type="text/javascript" src="static/js/globe.js"></script>
-
+	<!-- Main body script for instancing globe & data loading -->
     <script type="text/javascript" src="main.js"></script>
 </body>
 </html>

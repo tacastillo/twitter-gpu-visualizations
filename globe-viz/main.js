@@ -13,6 +13,20 @@ if (!Detector.webgl) {
     var xhr;
     TWEEN.start();
 
+    // function createSpan() { 
+    // var spanTag = document.createElement("span"); 
+
+    // spanTag.id = "span1"; 
+
+    // spanTag.className = "dynamicSpan"; 
+
+    // spanTag.innerHTML = "<b>HTML Span tag</b> " 
+    //                     + "created by using "  
+    //                     + "Javascript DOM dynamically."; 
+
+    // document.getElementById("currentInfo").appendChild(spanTag); 
+    // } 
+
     xhr = new XMLHttpRequest();
     xhr.open('GET', 'data/globeMapped.json', true);
     xhr.onreadystatechange = function(e) {
@@ -20,6 +34,7 @@ if (!Detector.webgl) {
             if (xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
                 window.data = data;
+                console.log(data);
                 for (i=0;i<data.length;i++) {
                     globe.addData(data[i][1], {format: 'magnitude', name: data[i][0], animated: true});
                 }
