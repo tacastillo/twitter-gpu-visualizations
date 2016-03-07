@@ -131,6 +131,8 @@ DAT.Globe = function(container, colorFn) {
 
     mesh = new THREE.Mesh(geometry, material);
     mesh.matrixAutoUpdate = false;
+
+    mesh.name = "WORLD_MESH";
     scene.addObject(mesh);
 
     shader = Shaders['atmosphere'];
@@ -149,6 +151,8 @@ DAT.Globe = function(container, colorFn) {
     mesh.flipSided = true;
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
+
+    mesh.name = "ATMOSPHERE_MESH"
     sceneAtmosphere.addObject(mesh);
 
     geometry = new THREE.Cube(0.75, 0.75, 1, 1, 1, 1, null, false, { px: true,
@@ -193,6 +197,7 @@ DAT.Globe = function(container, colorFn) {
     var lat, lng, size, color, i;
 
     var subgeo = new THREE.Geometry();
+    subgeo.name = "SUBGEOMETRY";
     for (i = 0; i < data.length; i += 3) {
       lat = data[i];
       lng = data[i + 1];
@@ -211,6 +216,7 @@ DAT.Globe = function(container, colorFn) {
               vertexColors: THREE.FaceColors,
               morphTargets: false
       }));
+      points.name = "POINTS";
       scene.addObject(points);
     }
   }
@@ -312,6 +318,10 @@ DAT.Globe = function(container, colorFn) {
     distanceTarget = distanceTarget < 350 ? 350 : distanceTarget;
   }
 
+  //EXTREMELY IMPORTANT!!!! ONLY REQUEST ANIMATION FRAME ONCE, OR ELSE
+  //YOUR OS WILL CONTINUE TO GENERATE ANIMATION FRAMES! This is the equivalent
+  //of creating multiple instances of the visualization WITHOUT RENDERING THEM.
+  //They sit back and eat tons of power.
   function animate() {
     requestAnimationFrame(animate);
     render();
@@ -346,8 +356,10 @@ DAT.Globe = function(container, colorFn) {
     // I am pretty sure I am doing it wrong, but there is no documentation I can
     // find on the Web, and it is quarter past two in the night, so I will go with
     // "this seems superficially to work enough for a throwaway website"
-
+    console.log("In ClearData");
+    console.log("Scene Web GL Objects");
     console.log(this.scene.__webglObjects);
+    console.log("Scene Children")
     console.log(this.scene.children);
 
     if (this.scene.__webglObjects)

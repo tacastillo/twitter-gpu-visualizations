@@ -64,7 +64,10 @@ if(!Detector.webgl){
                   tableRow.appendChild(dateRowContents);
                   navTable.appendChild(tableRow);
 
+                  //Load initial date as the first day
                   loadDateData(0);
+                  //Animate the globe ONCE. 
+                  globe.animate();
                 };
             }
         }
@@ -84,7 +87,6 @@ if(!Detector.webgl){
     globe.clearData();
     globe.addData(data);
     globe.createPoints();
-    globe.animate();
 
     document.getElementById('load').innerHTML = ' ';
 
