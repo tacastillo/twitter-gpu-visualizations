@@ -4,28 +4,41 @@
     <title>WebGL Globe</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="static/css/globe.css">
-
-    <!-- General Jquery -->
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  	<!-- UI Jquery Scripts -->
-  	<script type="text/javascript" src="static/js/globeVisualizationHelper.js"></script>
 </head>
 <body>
-      <div id="currentInfo">
-<!-- 	    <span id="year1990" class="year">1990</span>
-	    <span id="year1995" class="year">1995</span>
-	    <span id="year2000" class="year">2000</span> -->
-	  </div>
-
-	  <div id="title">
-	    Tweets(By Random Filter)
-	  </div>
     <div id="container"></div>
+
+    <div id="info">
+      <strong>Original by <a href="http://simia.net/wikiglobe/">Denny Vrandecic</a></strong>
+      <span class="bull">&bull;</span>
+      Based on <a href="http://code.google.com/p/webgl-globe/">WebGL Globe</a>,
+      <a href="http://www.wikidata.org">Wikidata</a> and
+      <a href="http://dbpedia.org">DBpedia</a>
+    </div>
+
+    <div id="title">
+      <span style="font-size:200%">Wikipedia globe</span>
+      <br>
+      &nbsp;
+      <br>
+      <table id="navigationTable">
+       <tr>
+        <td> </td>
+        <td style="font-size:60%;text-align:center">&larr; speed / detail &rarr;</td>
+       </tr>
+      </table>
+      <br>
+      &nbsp;
+      <br>
+      <span id="load"> </span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <!-- WebGL/Three Globe frameworks -->
+    <script type="text/javascript" src="static/js/Three/ThreeWebGL.js"></script>
+    <script type="text/javascript" src="static/js/Three/ThreeExtras.js"></script>
+    <script type="text/javascript" src="static/js/Three/RequestAnimationFrame.js"></script>
     <script type="text/javascript" src="static/js/Three/Detector.js"></script>
-    <script type="text/javascript" src="static/js/three.min.js"></script>
-    <script type="text/javascript" src="static/js/Tween.js"></script>
     <script type="text/javascript" src="static/js/globe.js"></script>
 	<!-- Main body script for instancing globe & data loading -->
     <script type="text/javascript" src="main.js"></script>
