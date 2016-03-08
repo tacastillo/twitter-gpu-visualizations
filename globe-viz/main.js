@@ -7,12 +7,14 @@ if(!Detector.webgl){
     var currentRes = 1;
 
   var datasetRandomized = [];
-  var currentDate = 0;
+  var currentDate;
+  var nextDate;
+  var fixedNumOfDates = 10;
 
-  /* - INITDATA - 
-   * This method is used to manually load all of the JSON data on the client side and parse it into
-   * a randomized series of arrays to simulate the data points being spread across different "dates".
-   * Dynamically generates the DOM elements for browsing through each date.
+  /* initData
+   * - This method is used to manually load all of the JSON data on the client side and parse it into
+   *   a randomized series of arrays to simulate the data points being spread across different "dates".
+   *   Dynamically generates the DOM elements for browsing through each date.
    */
   var initData = function() {
     xhr = new XMLHttpRequest();
@@ -21,7 +23,11 @@ if(!Detector.webgl){
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 //Generate a random % of dates to split by(eg, if it's 7, then split globeMapped.json's data into 7 portions)
-                var numOfDates = Math.floor((Math.random() * 10) + 1);
+                //COMMENT THE BELOW LINE OUT(and the other one in) to change it to randomized.
+                //var numOfDates = Math.floor((Math.random() * 10) + 1);
+                //Fixed number of dates to split by
+                var numOfDates = fixedNumOfDates;
+
                 for (i = 0; i < numOfDates; i++) {
                   var newArray = [];
                   datasetRandomized.push(newArray);
@@ -49,7 +55,7 @@ if(!Detector.webgl){
                   var dateRowHeadCell = document.createElement("span");
 
                   dateRowHeadCell.onclick = function(){
-                    loadDateData(0);
+                    manualSetDate(0);
                   };
                   dateRowHeadCell.innerHTML = "Dates";
 
@@ -65,7 +71,11 @@ if(!Detector.webgl){
                   navTable.appendChild(tableRow);
 
                   //Load initial date as the first day
-                  loadDateData(0);
+                  currentDate = 0;
+                  nextDate = 1;
+                  loadDateData(currentDate);
+                  //Set the interval to run every 5 seconds
+                  window.setInterval(autoAdvanceDate, 1000);
                   //Animate the globe ONCE. 
                   globe.animate();
                 };
@@ -75,8 +85,23 @@ if(!Detector.webgl){
     xhr.send(null);
   }
 
+  /**
+   * manualSetDate
+   * - Method for manually setting the date from an HTML element. The date
+   *   argument will always be correct.
+   */
+  var manualSetDate = function(date) {
+    loadDateData(date);
+    nextDate = date + 1;
+  }
+
+  /**
+   * loadDateData
+   * - Generic method for unloading the current data from the globe & replacing
+   *   it with a new one. Note that the date argument here implies an INDEX in 
+   *   the global "datasetRandomized" array. 
+   */
   var loadDateData = function(date) {
-    console.log(date);
     document.getElementById("date" + currentDate).style.color = '#555';
     currentDate = date;
     document.getElementById("date" + currentDate).style.color = '#fff';
@@ -92,16 +117,36 @@ if(!Detector.webgl){
 
   };
 
+  /**
+   * createDateSpan
+   * - Dynamically generates the span element which represents the possible 
+   *   dates for a user to select on the main page(the little bullets). The
+   *   dateValue argument is generated from the index of the dataset in init().
+   */
   var createDateSpan = function(dateValue) {
     var spanTag = document.createElement("span");
     spanTag.id = "date" + dateValue;
     spanTag.className = "bull";
     spanTag.innerHTML = "&#x25cf;"
     spanTag.onclick = function(){
-      loadDateData(dateValue);
+      manualSetDate(dateValue);
     }
     return spanTag;
   }
-    
+
+  /**
+   * autoAdvanceDate
+   * - Function that runs on the specified interval in init(), does an
+   *   automatic data load so the "timeline" can advance itself.
+   */
+  var autoAdvanceDate = function() {
+    loadDateData(nextDate);
+    currentDate = nextDate;
+    nextDate++;
+    if(nextDate >= datasetRandomized.length) {
+        nextDate = 0;
+    }
+  }
+
   initData();
 }
