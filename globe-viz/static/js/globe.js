@@ -96,7 +96,6 @@ DAT.Globe = function(container, colorFn) {
   var sphereHeightSegments = 30;
 
   function init() {
-
     container.style.color = '#fff';
     container.style.font = '13px/20px Arial, sans-serif';
 
@@ -356,12 +355,6 @@ DAT.Globe = function(container, colorFn) {
     // I am pretty sure I am doing it wrong, but there is no documentation I can
     // find on the Web, and it is quarter past two in the night, so I will go with
     // "this seems superficially to work enough for a throwaway website"
-    console.log("In ClearData");
-    console.log("Scene Web GL Objects");
-    console.log(this.scene.__webglObjects);
-    console.log("Scene Children")
-    console.log(this.scene.children);
-
     if (this.scene.__webglObjects)
       while (this.scene.__webglObjects.length > 1)
         this.scene.__webglObjects.pop();

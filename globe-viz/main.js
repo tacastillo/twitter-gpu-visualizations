@@ -11,6 +11,28 @@ if(!Detector.webgl){
   var nextDate;
   var fixedNumOfDates = 10;
 
+  /* initGlobeForRender
+   * - Simple hack method to initialize webGL's renderers on startup. This
+   *   ensures that we have a globe mesh object to show and an initial data
+   *   set to update later. Uses a lot of magic specific numbers.
+   */
+  var initGlobeForRender = function() {
+    data = ["data", [38.2898512, -78.7136328, 1]];
+    window.data = data;
+    datasetRandomized.push([]);
+    var temp = data[1];
+    for(i = 0; i < temp.length; i++) {
+        datasetRandomized[0].push(temp[i]);
+    }
+
+    window.data = datasetRandomized[0];
+    globe.clearData();
+    globe.addData(data);
+    globe.createPoints();
+
+    globe.animate();
+  }
+
   /* initData
    * - This method is used to manually load all of the JSON data on the client side and parse it into
    *   a randomized series of arrays to simulate the data points being spread across different "dates".
@@ -23,12 +45,11 @@ if(!Detector.webgl){
       //Fixed number of dates to split by
       var numOfDates = fixedNumOfDates;
       console.log("DATA", data);
-
+      datasetRandomized = [];
       for (i = 0; i < numOfDates; i++) {
         var newArray = [];
         datasetRandomized.push(newArray);
       }
-
       window.data = data;
 
       //Iterates through the top-level of the json array, starts with date-data heirarchy
@@ -43,37 +64,38 @@ if(!Detector.webgl){
         }
       }
 
-      window.onload = function() {
-        var navTable = document.getElementById("navigationTable");
-        var tableRow = document.createElement("tr");
-        var dateRowHead = document.createElement("td");
-        var dateRowHeadCell = document.createElement("span");
+      //!!!!!! DYNAMIC GENERATION OF DOM ELEMENTS !!!!!!!
+      //NOTE: This original ENTIRE block(down to setInterval) depended on 
+      //window.onload(). THIS MAY NOT WORK IN THE FUTURE, but for now 
+      //it is OK
+      var navTable = document.getElementById("navigationTable");
+      var tableRow = document.createElement("tr");
+      var dateRowHead = document.createElement("td");
+      var dateRowHeadCell = document.createElement("span");
 
-        dateRowHeadCell.onclick = function(){
-          manualSetDate(0);
-        };
-        dateRowHeadCell.innerHTML = "Dates";
-
-        dateRowHead.appendChild(dateRowHeadCell);
-        tableRow.appendChild(dateRowHead);
-
-        var dateRowContents = document.createElement("td");
-        for (i = 0; i < numOfDates; i++) {
-          var dateBullet = createDateSpan(i);
-          dateRowContents.appendChild(dateBullet);
-        }
-        tableRow.appendChild(dateRowContents);
-        navTable.appendChild(tableRow);
-
-        //Load initial date as the first day
-        currentDate = 0;
-        nextDate = 1;
-        loadDateData(currentDate);
-        //Set the interval to run every 5 seconds
-        window.setInterval(autoAdvanceDate, 1000);
-        //Animate the globe ONCE. 
-        globe.animate();
+      dateRowHeadCell.onclick = function(){
+        manualSetDate(0);
       };
+      dateRowHeadCell.innerHTML = "Dates";
+
+      dateRowHead.appendChild(dateRowHeadCell);
+      tableRow.appendChild(dateRowHead);
+
+      var dateRowContents = document.createElement("td");
+      for (i = 0; i < numOfDates; i++) {
+        var dateBullet = createDateSpan(i);
+        dateRowContents.appendChild(dateBullet);
+      }
+      tableRow.appendChild(dateRowContents);
+      navTable.appendChild(tableRow);
+
+      //Load initial date as the first day
+      currentDate = 0;
+      nextDate = 1;
+      loadDateData(currentDate);
+      //Set the interval to run every 5 seconds
+      window.setInterval(autoAdvanceDate, 1000);
+
   }
 
   /**
@@ -138,4 +160,6 @@ if(!Detector.webgl){
         nextDate = 0;
     }
   }
+
+  initGlobeForRender();
 }
