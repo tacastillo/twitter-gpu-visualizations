@@ -16,73 +16,64 @@ if(!Detector.webgl){
    *   a randomized series of arrays to simulate the data points being spread across different "dates".
    *   Dynamically generates the DOM elements for browsing through each date.
    */
-  var initData = function() {
-    xhr = new XMLHttpRequest();
-    xhr.open('GET', 'data/globeMapped.json', true);
-    xhr.onreadystatechange = function(e) {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                //Generate a random % of dates to split by(eg, if it's 7, then split globeMapped.json's data into 7 portions)
-                //COMMENT THE BELOW LINE OUT(and the other one in) to change it to randomized.
-                //var numOfDates = Math.floor((Math.random() * 10) + 1);
-                //Fixed number of dates to split by
-                var numOfDates = fixedNumOfDates;
+  var initData = function(data) {
+      //Generate a random % of dates to split by(eg, if it's 7, then split globeMapped.json's data into 7 portions)
+      //COMMENT THE BELOW LINE OUT(and the other one in) to change it to randomized.
+      //var numOfDates = Math.floor((Math.random() * 10) + 1);
+      //Fixed number of dates to split by
+      var numOfDates = fixedNumOfDates;
+      console.log("DATA", data);
 
-                for (i = 0; i < numOfDates; i++) {
-                  var newArray = [];
-                  datasetRandomized.push(newArray);
-                }
+      for (i = 0; i < numOfDates; i++) {
+        var newArray = [];
+        datasetRandomized.push(newArray);
+      }
 
-                var data = JSON.parse(xhr.responseText);
-                window.data = data;
+      window.data = data;
 
-                //Iterates through the top-level of the json array, starts with date-data heirarchy
-                for (i=0;i<data.length;i++) {
-                  var dataset = data[i][1];
-                  //Iterate through dataset through sets of 3, since each point depends on a 3-set index
-                  for (j = 0; j < dataset.length; j+=3) {
-                    var randomIndex = Math.floor(Math.random() * numOfDates);
-                    datasetRandomized[randomIndex].push(dataset[j]); //Latitude
-                    datasetRandomized[randomIndex].push(dataset[j + 1]); //Longitude
-                    datasetRandomized[randomIndex].push(dataset[j + 2]); //Magnitude
-                  }
-                }
-
-                window.onload = function() {
-                  var navTable = document.getElementById("navigationTable");
-                  var tableRow = document.createElement("tr");
-                  var dateRowHead = document.createElement("td");
-                  var dateRowHeadCell = document.createElement("span");
-
-                  dateRowHeadCell.onclick = function(){
-                    manualSetDate(0);
-                  };
-                  dateRowHeadCell.innerHTML = "Dates";
-
-                  dateRowHead.appendChild(dateRowHeadCell);
-                  tableRow.appendChild(dateRowHead);
-
-                  var dateRowContents = document.createElement("td");
-                  for (i = 0; i < numOfDates; i++) {
-                    var dateBullet = createDateSpan(i);
-                    dateRowContents.appendChild(dateBullet);
-                  }
-                  tableRow.appendChild(dateRowContents);
-                  navTable.appendChild(tableRow);
-
-                  //Load initial date as the first day
-                  currentDate = 0;
-                  nextDate = 1;
-                  loadDateData(currentDate);
-                  //Set the interval to run every 5 seconds
-                  window.setInterval(autoAdvanceDate, 1000);
-                  //Animate the globe ONCE. 
-                  globe.animate();
-                };
-            }
+      //Iterates through the top-level of the json array, starts with date-data heirarchy
+      for (i=0;i<data.length;i++) {
+        var dataset = data[i][1];
+        //Iterate through dataset through sets of 3, since each point depends on a 3-set index
+        for (j = 0; j < dataset.length; j+=3) {
+          var randomIndex = Math.floor(Math.random() * numOfDates);
+          datasetRandomized[randomIndex].push(dataset[j]); //Latitude
+          datasetRandomized[randomIndex].push(dataset[j + 1]); //Longitude
+          datasetRandomized[randomIndex].push(dataset[j + 2]); //Magnitude
         }
-    };
-    xhr.send(null);
+      }
+
+      window.onload = function() {
+        var navTable = document.getElementById("navigationTable");
+        var tableRow = document.createElement("tr");
+        var dateRowHead = document.createElement("td");
+        var dateRowHeadCell = document.createElement("span");
+
+        dateRowHeadCell.onclick = function(){
+          manualSetDate(0);
+        };
+        dateRowHeadCell.innerHTML = "Dates";
+
+        dateRowHead.appendChild(dateRowHeadCell);
+        tableRow.appendChild(dateRowHead);
+
+        var dateRowContents = document.createElement("td");
+        for (i = 0; i < numOfDates; i++) {
+          var dateBullet = createDateSpan(i);
+          dateRowContents.appendChild(dateBullet);
+        }
+        tableRow.appendChild(dateRowContents);
+        navTable.appendChild(tableRow);
+
+        //Load initial date as the first day
+        currentDate = 0;
+        nextDate = 1;
+        loadDateData(currentDate);
+        //Set the interval to run every 5 seconds
+        window.setInterval(autoAdvanceDate, 1000);
+        //Animate the globe ONCE. 
+        globe.animate();
+      };
   }
 
   /**
@@ -147,6 +138,4 @@ if(!Detector.webgl){
         nextDate = 0;
     }
   }
-
-  initData();
 }

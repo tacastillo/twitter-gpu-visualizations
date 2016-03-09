@@ -4,6 +4,7 @@
     <title>WebGL Globe</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="static/css/globe.css">
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
     <div id="container"></div>
@@ -43,5 +44,12 @@
     <script type="text/javascript" src="static/js/globe.js"></script>
 	<!-- Main body script for instancing globe & data loading -->
     <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript">
+      var socket = io();
+      socket.emit('getLocations');
+      socket.on('sendLocations', function(result) {
+        initData(result);
+      });
+    </script>
 </body>
 </html>
