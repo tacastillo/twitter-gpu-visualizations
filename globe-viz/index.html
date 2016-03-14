@@ -7,7 +7,7 @@
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
-    <div id="container"></div>
+    <div id="globeContainer"></div>
 
     <div id="info">
       <strong>Original by <a href="http://simia.net/wikiglobe/">Denny Vrandecic</a></strong>
@@ -18,7 +18,7 @@
     </div>
 
     <div id="title">
-      <span style="font-size:200%">Wikipedia globe</span>
+      <span style="font-size:200%">Twitter Globe</span>
       <br>
       &nbsp;
       <br>
@@ -29,11 +29,14 @@
        </tr>
       </table>
       <br>
+      <span style="font-size:120%"> Controls </span>
+      <div id="controlMenu" class="controlMenu">
+        <button type="button" onclick="toggleAutomaticTimer()"> Turn On/Off Auto-Timer </button>
+      </div>
       &nbsp;
       <br>
       <span id="load"> </span>
     </div>
-
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <!-- WebGL/Three Globe frameworks -->
     <script type="text/javascript" src="static/js/Three/three.min.js"></script>

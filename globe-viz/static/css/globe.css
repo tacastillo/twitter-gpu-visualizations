@@ -4,7 +4,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #000000 url(static/img/loading.gif) center center no-repeat;
+  background: #000000 url("/static/img/loading.gif") center center no-repeat;
   color: #ffffff;
   font-family: sans-serif;
   font-size: 13px;
@@ -43,7 +43,7 @@ a:hover {
   position: absolute;
   top: 20px;
   width: 270px;
-  left: 20px;
+  left: 1rem;
   background-color: rgba(0,0,0,0.2);
   border-radius: 3px;
   font: 20px Gill Sans MT;

@@ -1,7 +1,7 @@
 if(!Detector.webgl){
     Detector.addGetWebGLMessage();
 } else {
-    var container = document.getElementById('container');
+    var container = document.getElementById('globeContainer');
     var globe = new DAT.Globe(container);
     var currentLang = 'en';
     var currentRes = 1;
@@ -10,6 +10,9 @@ if(!Detector.webgl){
   var currentDate;
   var nextDate;
   var fixedNumOfDates = 10;
+
+  var startTimer = true;
+  var interval;
 
   /* initGlobeForRender
    * - Simple hack method to initialize webGL's renderers on startup. This
@@ -33,6 +36,12 @@ if(!Detector.webgl){
     globe.animate();
   }
 
+  var processDataForGlobe = function(data) {
+    var json = data.reduce(function(array, element) {
+      return array.concat([element.latitude,element.longitude, 1]);
+    }, []);
+    return [["data",json]];
+  }
   /* initData
    * - This method is used to manually load all of the JSON data on the client side and parse it into
    *   a randomized series of arrays to simulate the data points being spread across different "dates".
@@ -44,6 +53,7 @@ if(!Detector.webgl){
       //var numOfDates = Math.floor((Math.random() * 10) + 1);
       //Fixed number of dates to split by
       var numOfDates = fixedNumOfDates;
+      data = processDataForGlobe(data);
       console.log("DATA", data);
       datasetRandomized = [];
       for (i = 0; i < numOfDates; i++) {
@@ -68,6 +78,7 @@ if(!Detector.webgl){
       //NOTE: This original ENTIRE block(down to setInterval) depended on 
       //window.onload(). THIS MAY NOT WORK IN THE FUTURE, but for now 
       //it is OK
+
       var navTable = document.getElementById("navigationTable");
       var tableRow = document.createElement("tr");
       var dateRowHead = document.createElement("td");
@@ -94,10 +105,21 @@ if(!Detector.webgl){
       nextDate = 1;
       loadDateData(currentDate);
       //Set the interval to run every 5 seconds
-      window.setInterval(autoAdvanceDate, 1000);
-
+      if (startTimer) {
+        interval = window.setInterval(autoAdvanceDate, 1000);
+      }
   }
 
+  var toggleAutomaticTimer = function() {
+    if (startTimer) {
+      window.clearInterval(interval);
+      startTimer = false;
+    }
+    else {
+      interval = window.setInterval(autoAdvanceDate, 1000);
+      startTimer = true;
+    }
+  }
   /**
    * manualSetDate
    * - Method for manually setting the date from an HTML element. The date

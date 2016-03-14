@@ -17,11 +17,12 @@ app.use(express.static('.'))
 
 io.on('connection', function(socket) {
     socket.on('getLocations', function(date) {
-        connection.query('SELECT * from locationList_valid LIMIT 100', function(err, rows, fields) {
-            var json = rows.reduce(function(array, element) {
-                return array.concat([element.lat,element.lng, 1]);
-            }, []);
-            io.emit('sendLocations', err ? err: [["data",json]]);
+        //connection.query('SELECT * from locationList_valid LIMIT 3000', function(err, rows, fields) {
+        connection.query('SELECT * from tweet_with_lon_lat LIMIT 10000', function(err, rows, fields) {
+            // var json = rows.reduce(function(array, element) {
+            //     return array.concat([element.latitude,element.longitude, 1]);
+            // }, []);
+            io.emit('sendLocations', err ? err: rows);
         });
     });
 });
