@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+text {
+  font: 10px sans-serif;
+}
+
+</style>
+<html lang="en">
+  <head>
+      <title>Tweet Bubble Visualization</title>
+      <meta charset="utf-8">
+      <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+      <script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+  <button id="randomizeCount">Randomize num of tweets</button>
+  <div id="svgDiv">
+  </div>
+  <script type="text/javascript" src="bubblevizmain.js"></script>
+  <script type="text/javascript">
+      var socket = io();
+      socket.emit('getLocations');
+      socket.on('sendLocations', function(result) {
+        initDataForViz(result);
+      });
+    </script>
+  </body>
+
+</html>

@@ -54,7 +54,6 @@ if(!Detector.webgl){
       //Fixed number of dates to split by
       var numOfDates = fixedNumOfDates;
       data = processDataForGlobe(data);
-      console.log("DATA", data);
       datasetRandomized = [];
       for (i = 0; i < numOfDates; i++) {
         var newArray = [];
