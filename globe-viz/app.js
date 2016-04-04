@@ -11,6 +11,9 @@ var connection = mysql.createConnection({
     database: 'KineVote'
 });
 
+var dateStart = new Date(2016, 1, 19).toISOString();
+var dateFinish = new Date().toISOString();
+
 connection.connect();
 
 app.use(express.static('.'))
@@ -18,12 +21,20 @@ app.use(express.static('.'))
 io.on('connection', function(socket) {
     socket.on('getLocations', function(date) {
         //connection.query('SELECT * from locationList_valid LIMIT 3000', function(err, rows, fields) {
-        connection.query('SELECT * from tweet_with_lon_lat LIMIT 10000', function(err, rows, fields) {
+        var dateFilter = "WHERE $date > '" + dateStart + "' AND $date < '" + dateFinish + "'";
+        var query = 'SELECT * from tweet_with_lon_lat ' + dateFilter + ' LIMIT 10000';
+        console.log(query); 
+        connection.query(query, function(err, rows, fields) {
             // var json = rows.reduce(function(array, element) {
             //     return array.concat([element.latitude,element.longitude, 1]);
             // }, []);
+            console.log(rows.length);
             io.emit('sendLocations', err ? err: rows);
         });
+    });
+    socket.on('changeDate', function(dates) {
+        dateStart = dates['newStart'];
+        dateFinish = dates['newFinish']
     });
 });
 
