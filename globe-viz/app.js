@@ -21,8 +21,8 @@ app.use(express.static('.'))
 io.on('connection', function(socket) {
     socket.on('getLocations', function(date) {
         //connection.query('SELECT * from locationList_valid LIMIT 3000', function(err, rows, fields) {
-        var dateFilter = "WHERE $date > '" + dateStart + "' AND $date < '" + dateFinish + "'";
-        var query = 'SELECT * from tweet_with_lon_lat ' + dateFilter + ' LIMIT 10000';
+        // var dateFilter = "WHERE $date > '" + dateStart + "' AND $date < '" + dateFinish + "'";
+        var query = 'SELECT * from tweet_with_lon_lat LIMIT 10000';
         console.log(query); 
         connection.query(query, function(err, rows, fields) {
             // var json = rows.reduce(function(array, element) {
@@ -35,6 +35,7 @@ io.on('connection', function(socket) {
     socket.on('changeDate', function(dates) {
         dateStart = dates['newStart'];
         dateFinish = dates['newFinish']
+        io.emit('refilterByDates', {dateStart: dateStart, dateFinish: dateFinish});
     });
 });
 

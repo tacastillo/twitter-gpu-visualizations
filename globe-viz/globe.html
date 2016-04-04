@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="static/css/globe.css">
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"></script>
 </head>
 <body>
     <div id="globeContainer"></div>
@@ -48,11 +49,27 @@
 	<!-- Main body script for instancing globe & data loading -->
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript">
+      var data = [];
       var socket = io();
       var date = new Date();
       socket.emit('getLocations', date.toISOString());
       socket.on('sendLocations', function(result) {
+        data = result;
+        console.log(data);
         initData(result);
+      });
+      socket.on('refilterByDates', function(dates) {
+        /*
+          Note: Can be shortened to the snippet below if function calls wait for their parameters value to be resolve first before actually executing. otherwise promise is necessary lol.
+          initData(data.filter(function(row) {
+            return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+          }));
+         */
+        Promise.filter(data, function(row) {
+          return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+        }).then(function(filteredData) {
+          initData(filteredData);
+        });
       });
     </script>
 </body>
