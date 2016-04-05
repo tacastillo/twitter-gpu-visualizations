@@ -33,9 +33,11 @@ io.on('connection', function(socket) {
         });
     });
     socket.on('changeDate', function(dates) {
+        console.log('dates: ', dates);
         dateStart = dates['newStart'];
-        dateFinish = dates['newFinish']
-        io.emit('refilterByDates', {dateStart: dateStart, dateFinish: dateFinish});
+        dateFinish = dates['newFinish'];
+        var args = {dateStart: dateStart, dateFinish: dateFinish}
+        io.emit('refilterByDates', args);
     });
 });
 

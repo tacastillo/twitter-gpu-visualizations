@@ -52,6 +52,7 @@ if(!Detector.webgl){
       //COMMENT THE BELOW LINE OUT(and the other one in) to change it to randomized.
       //var numOfDates = Math.floor((Math.random() * 10) + 1);
       //Fixed number of dates to split by
+      console.log("initializing data of size" + data.length);
       var numOfDates = fixedNumOfDates;
       data = processDataForGlobe(data);
       datasetRandomized = [];

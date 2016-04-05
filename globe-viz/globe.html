@@ -49,12 +49,13 @@
 	<!-- Main body script for instancing globe & data loading -->
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript">
+      var rawResults; //had to make a raw copy of the result because the var 'data' gets manipulated in initData();
       var data = [];
       var socket = io();
       var date = new Date();
       socket.emit('getLocations', date.toISOString());
       socket.on('sendLocations', function(result) {
-        data = result;
+        rawResults = data = result;
         console.log(data);
         initData(result);
       });
@@ -65,7 +66,7 @@
             return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
           }));
          */
-        Promise.filter(data, function(row) {
+        Promise.filter(rawResults, function(row) {
           return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
         }).then(function(filteredData) {
           initData(filteredData);
