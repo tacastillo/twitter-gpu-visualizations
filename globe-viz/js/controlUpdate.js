@@ -1,8 +1,8 @@
 var socket = io();
 var slider = document.getElementById('slider');
 var updateButton = document.getElementById('update');
-var sliderValues = {start: new Date(2016, 1, 19).getTime(),
-	finish: Date.now() };
+var sliderValues = {start: new Date(2016, 1, 19).getTime(), finish: Date.now() };
+var labels = [document.getElementById('min-label'), document.getElementById('max-label')];
 
 noUiSlider.create(slider, {
 	start: [ sliderValues["start"], sliderValues["finish"] ],
@@ -17,6 +17,7 @@ noUiSlider.create(slider, {
 slider.noUiSlider.on('update', function( values, handle ) {
 	sliderValues["start"] = new Date(+values[0]).toISOString();
 	sliderValues["finish"] = new Date(+values[1]).toISOString();
+	labels[handle].innerHTML = new Date(+values[handle]);
 });
 
 updateButton.addEventListener("click", function() {
