@@ -1,7 +1,7 @@
 var socket = io();
 var slider = document.getElementById('slider');
 var updateButton = document.getElementById('update');
-var sliderValues = {start: new Date(2016, 1, 19).getTime(), finish: Date.now() };
+var sliderValues = {start: new Date(2016, 1, 19).getTime(), finish: new Date(2016,2,7) };
 var labels = [document.getElementById('min-label'), document.getElementById('max-label')];
 
 noUiSlider.create(slider, {
