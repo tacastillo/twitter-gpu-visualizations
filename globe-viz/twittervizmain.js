@@ -1,8 +1,8 @@
 
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = (window.innerWidth/2) - margin.left - margin.right,
-    height = (window.innerHeight/2) - margin.top - margin.bottom;
+    width = (window.innerWidth/4)*3 - margin.left - margin.right,
+    height = (window.innerHeight/4)*3 - margin.top - margin.bottom;
 
 // Parse the date / time
 var parseDate = d3.time.format("%Y-%m-%d").parse;
@@ -53,7 +53,6 @@ var countTweetsByDate = function(data) {
     var dateWrappers = [];
     for (var key in countedDates) {
         if (countedDates.hasOwnProperty(key)) {
-            console.log(key);
             dateWrappers.push({
                 "date": parseDate(key),
                 "close": countedDates[key]
@@ -62,6 +61,43 @@ var countTweetsByDate = function(data) {
     }
 
     return dateWrappers;
+}
+
+var updateData = function(data) {
+    console.log("Updating data");
+    var formatData = countTweetsByDate(data);
+    // Scale the range of the data
+    x.domain(d3.extent(formatData, function(d) { return d.date; }));
+    y.domain([0, d3.max(formatData, function(d) { return d.close; })]);
+
+    console.log("Updated domains");
+    var t = svg.transition().duration(750);
+    t.select(".x.axis").call(xAxis);
+    console.log("Updating axis");
+    t.select(".line").attr("d", valueline(formatData));
+    console.log("Updating lines");
+
+    svg.selectAll("circle").remove();
+
+    svg.selectAll("dot")
+        .data(formatData)
+        .enter().append("circle")                               
+        .attr("r", 7)       
+        .attr("cx", function(d) { return x(d.date); })       
+        .attr("cy", function(d) { return y(d.close); })     
+        .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(formatTime(d.date) + "<br/>"  + d.close + " tweets")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
 }
 var initDataForViz = function(data) {
     var formatData = countTweetsByDate(data);

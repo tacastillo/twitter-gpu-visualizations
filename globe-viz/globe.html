@@ -53,11 +53,16 @@
       var data = [];
       var socket = io();
       var date = new Date();
+      var initialized = false;
+
       socket.emit('getLocations', date.toISOString());
       socket.on('sendLocations', function(result) {
-        rawResults = data = result;
-        console.log(data);
-        initData(result);
+        if(!initialized) {
+          rawResults = data = result;
+          console.log(data);
+          initData(result);
+          initialized = true;
+        }
       });
       socket.on('refilterByDates', function(dates) {
         /*

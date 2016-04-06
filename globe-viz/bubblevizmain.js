@@ -1,5 +1,5 @@
 
-var diameter = 960,
+var diameter = (window.innerWidth/3)*2,
     format = d3.format(",d"),
     color = d3.scale.category20();
 
@@ -36,6 +36,7 @@ var sortTweetsByFollowers = function(data) {
 var initDataForViz = function(data) {
 	var sorted = sortTweetsByFollowers(data);
 
+console.log(sorted);
     sorted = sorted.map(function(d){ d.value = +d.followers_count; return d; });
 	//setup the chart
     var bubbles = svg.append("g")
@@ -146,8 +147,6 @@ var generateBubbles = function(nodes, numOf) {
     var updateSelection = bubbles.data(formattedNodes);
     var enterSelection = updateSelection.enter();
 
-    console.log("Adding " + formattedNodes.length + " objects");
-    console.log(enterSelection);
     var bubbleTweet = enterSelection.append("g").attr("class", "bubbleTweet");
 	//create the bubbles
     bubbleTweet

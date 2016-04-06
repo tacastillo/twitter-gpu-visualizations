@@ -39,15 +39,39 @@ div.tooltip {
     <meta charset="utf-8">
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"></script>
 </head>
 <body>
 
     <script type="text/javascript" src="twittervizmain.js"></script>
     <script type="text/javascript">
+
+      var rawResults; //had to make a raw copy of the result because the var 'data' gets manipulated in initData();
+      var data = [];
       var socket = io();
-      socket.emit('getLocations');
+      var date = new Date();
+      var initialized = false;
+      socket.emit('getLocations', date.toISOString());
       socket.on('sendLocations', function(result) {
-        initDataForViz(result);
+        if(!initialized) {
+            rawResults = data = result;
+            console.log(data);
+            initDataForViz(result);
+            initialized = true;
+        }
+      });
+      socket.on('refilterByDates', function(dates) {
+        /*
+          Note: Can be shortened to the snippet below if function calls wait for their parameters value to be resolve first before actually executing. otherwise promise is necessary lol.
+          initData(data.filter(function(row) {
+            return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+          }));
+         */
+        Promise.filter(rawResults, function(row) {
+          return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+        }).then(function(filteredData) {
+          updateData(filteredData);
+        });
       });
     </script>
 </body>
