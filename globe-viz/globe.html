@@ -69,7 +69,7 @@
         Promise.filter(rawResults, function(row) {
           return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
         }).then(function(filteredData) {
-          initData(filteredData);
+          changeDataSet(filteredData);
         });
       });
     </script>
