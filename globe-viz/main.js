@@ -6,10 +6,10 @@ if(!Detector.webgl){
     var currentLang = 'en';
     var currentRes = 1;
 
-  var datasetRandomized = [];
+  var dataset = [];
   var currentDate;
   var nextDate;
-  var fixedNumOfDates = 10;
+  var numOfDates;
 
   var startTimer = true;
   var interval;
@@ -21,14 +21,14 @@ if(!Detector.webgl){
    */
   var initGlobeForRender = function() {
     data = ["data", [38.2898512, -78.7136328, 1]];
-    window.data = data;
-    datasetRandomized.push([]);
+    //window.data = data;
+    dataset.push([]);
     var temp = data[1];
     for(i = 0; i < temp.length; i++) {
-        datasetRandomized[0].push(temp[i]);
+        dataset[0].push(temp[i]);
     }
 
-    window.data = datasetRandomized[0];
+    window.data = dataset[0];
     globe.clearData();
     globe.addData(data);
     globe.createPoints();
@@ -37,10 +37,101 @@ if(!Detector.webgl){
   }
 
   var processDataForGlobe = function(data) {
-    var json = data.reduce(function(array, element) {
-      return array.concat([element.latitude,element.longitude, 1]);
-    }, []);
-    return [["data",json]];
+    // var json = data.reduce(function(array, element) {
+    //   return array.concat([element.latitude,element.longitude, 1]);
+    // }, []);
+    // return [["data",json]];
+    //
+    //End result wants arrays like
+    // [[lat1, long1, mag1, lat2, long2, mag2], [lat3, long3, mag3]]
+    //     var countedDates = {};
+    // for (i = 0; i < data.length; i++) {
+    //     var obj = data[i];
+    //     if(countedDates[obj.date_simple] == null) {
+    //         countedDates[obj.date_simple] = 1;
+    //     }
+    //     else {
+    //         countedDates[obj.date_simple]++;
+    //     }
+    // }
+    
+    // var dateWrappers = [];
+    // for (var key in countedDates) {
+    //     if (countedDates.hasOwnProperty(key)) {
+    //         console.log(key);
+    //         dateWrappers.push({
+    //             "date": parseDate(key),
+    //             "close": countedDates[key]
+    //         })   
+    //     }
+    // }
+    var countedDates = {};
+    //[{date, []}]
+
+    for(i = 0; i < data.length; i++) {
+      var tweetObj = data[i];
+      if(countedDates[tweetObj.date_simple] == null) {
+        countedDates[tweetObj.date_simple] = [tweetObj];
+      }
+      else {
+        countedDates[tweetObj.date_simple].push(tweetObj);
+      }
+    }
+
+    var formattedDates = [];
+    for (var key in countedDates) {
+      if (countedDates.hasOwnProperty(key)) {
+        var coordinates = [];
+        var tweets = countedDates[key];
+        for(i = 0; i < tweets.length; i++) {
+          var singleTweet = tweets[i];
+          coordinates.push(singleTweet.latitude);
+          coordinates.push(singleTweet.longitude);
+          coordinates.push(1);
+        }
+        formattedDates.push({
+          "date": key,
+          "data": coordinates
+        })
+      }
+    }
+
+    return formattedDates;
+  }
+
+  var changeDataSet = function(data) {
+    console.log("Changed data set");
+    console.log(data);
+
+    var filteredData = processDataForGlobe(data);
+    console.log("filtered data");
+    console.log(filteredData);
+    generateBullets(filteredData);
+  }
+
+  var generateBullets = function(data) {
+    //Remove current bullets
+//    var d = document.getElementsByName("dateBullets");
+    // var node;
+    // for (node in d) {
+    //   console.log("YAS");
+    //   node.parentNode.removeChild(node);
+    // }
+
+    var dataRow = document.getElementById('dateRowContents');
+    while(dataRow.hasChildNodes()) {
+      console.log("Removed"); 
+      dataRow.removeChild(dataRow.firstChild);
+    }
+
+    for (i = 0; i < data.length; i++) {
+      var dateBullet = createDateSpan(data[i].date, i);
+      dateRowContents.appendChild(dateBullet);
+    }
+    
+    currentDate = 0;
+    nextDate = 1;
+    loadDateData(currentDate);
   }
   /* initData
    * - This method is used to manually load all of the JSON data on the client side and parse it into
@@ -53,36 +144,19 @@ if(!Detector.webgl){
       //var numOfDates = Math.floor((Math.random() * 10) + 1);
       //Fixed number of dates to split by
       console.log("initializing data of size" + data.length);
-      var numOfDates = fixedNumOfDates;
-      data = processDataForGlobe(data);
-      datasetRandomized = [];
-      for (i = 0; i < numOfDates; i++) {
-        var newArray = [];
-        datasetRandomized.push(newArray);
-      }
+      dataset = processDataForGlobe(data);
+      console.log(dataset);
+
       window.data = data;
 
-      //Iterates through the top-level of the json array, starts with date-data heirarchy
-      for (i=0;i<data.length;i++) {
-        var dataset = data[i][1];
-        //Iterate through dataset through sets of 3, since each point depends on a 3-set index
-        for (j = 0; j < dataset.length; j+=3) {
-          var randomIndex = Math.floor(Math.random() * numOfDates);
-          datasetRandomized[randomIndex].push(dataset[j]); //Latitude
-          datasetRandomized[randomIndex].push(dataset[j + 1]); //Longitude
-          datasetRandomized[randomIndex].push(dataset[j + 2]); //Magnitude
-        }
-      }
-
-      //!!!!!! DYNAMIC GENERATION OF DOM ELEMENTS !!!!!!!
-      //NOTE: This original ENTIRE block(down to setInterval) depended on 
-      //window.onload(). THIS MAY NOT WORK IN THE FUTURE, but for now 
-      //it is OK
 
       var navTable = document.getElementById("navigationTable");
       var tableRow = document.createElement("tr");
+      tableRow.setAttribute('id', "datesRow");
       var dateRowHead = document.createElement("td");
+      dateRowHead.setAttribute('id', "dateRowHead");
       var dateRowHeadCell = document.createElement("span");
+      dateRowHeadCell.setAttribute('id', "dateRowHeadCell");
 
       dateRowHeadCell.onclick = function(){
         manualSetDate(0);
@@ -93,12 +167,33 @@ if(!Detector.webgl){
       tableRow.appendChild(dateRowHead);
 
       var dateRowContents = document.createElement("td");
-      for (i = 0; i < numOfDates; i++) {
-        var dateBullet = createDateSpan(i);
+      dateRowContents.setAttribute('id', "dateRowContents");
+
+      numOfDates = dataset.length;
+      for (i = 0; i < dataset.length; i++) {
+        var dateBullet = createDateSpan(dataset[i].date, i);
+        dateBullet.setAttribute('name', 'dateBullets');
         dateRowContents.appendChild(dateBullet);
       }
       tableRow.appendChild(dateRowContents);
       navTable.appendChild(tableRow);
+
+      //Iterates through the top-level of the json array, starts with date-data heirarchy
+      // for (i=0;i<data.length;i++) {
+      //   var dataset = data[i][1];
+      //   //Iterate through dataset through sets of 3, since each point depends on a 3-set index
+      //   for (j = 0; j < dataset.length; j+=3) {
+      //     var randomIndex = Math.floor(Math.random() * numOfDates);
+      //     datasetRandomized[randomIndex].push(dataset[j]); //Latitude
+      //     datasetRandomized[randomIndex].push(dataset[j + 1]); //Longitude
+      //     datasetRandomized[randomIndex].push(dataset[j + 2]); //Magnitude
+      //   }
+      // }
+
+      //!!!!!! DYNAMIC GENERATION OF DOM ELEMENTS !!!!!!!
+      //NOTE: This original ENTIRE block(down to setInterval) depended on 
+      //window.onload(). THIS MAY NOT WORK IN THE FUTURE, but for now 
+      //it is OK
 
       //Load initial date as the first day
       currentDate = 0;
@@ -142,7 +237,7 @@ if(!Detector.webgl){
     document.getElementById("date" + currentDate).style.color = '#fff';
     document.getElementById('load').innerHTML = 'Loading...';
     
-    var data = datasetRandomized[date];
+    var data = dataset[date].data;
     window.data = data;
     globe.clearData();
     globe.addData(data);
@@ -158,14 +253,15 @@ if(!Detector.webgl){
    *   dates for a user to select on the main page(the little bullets). The
    *   dateValue argument is generated from the index of the dataset in init().
    */
-  var createDateSpan = function(dateValue) {
+  var createDateSpan = function(dateValue, index) {
     var spanTag = document.createElement("span");
-    spanTag.id = "date" + dateValue;
+    spanTag.id = "date" + index;
     spanTag.className = "bull";
     spanTag.innerHTML = "&#x25cf;"
     spanTag.onclick = function(){
-      manualSetDate(dateValue);
+      manualSetDate(index);
     }
+    spanTag.title = dateValue;
     return spanTag;
   }
 
@@ -178,7 +274,7 @@ if(!Detector.webgl){
     loadDateData(nextDate);
     currentDate = nextDate;
     nextDate++;
-    if(nextDate >= datasetRandomized.length) {
+    if(nextDate >= dataset.length) {
         nextDate = 0;
     }
   }
