@@ -1,11 +1,11 @@
 
-var diameter = (window.innerWidth/3)*2,
+var diameter = (window.innerHeight/8)*7,
     format = d3.format(",d"),
     color = d3.scale.category20();
 
 var bubble = d3.layout.pack()
     .size([diameter, diameter])
-    .value(function(d) {return d.followers_count;})
+    .value(function(d) {return d.numOfTweets;})
     .padding(1.5);
 
 var svg = d3.select("#svgDiv").append("svg")
@@ -33,34 +33,74 @@ var sortTweetsByFollowers = function(data) {
 	return sorted;
 }
 
-var initDataForViz = function(data) {
-	var sorted = sortTweetsByFollowers(data);
+var sortTweetsByCount = function(data) {
+    
+    //console.log(data);
+    var users = {};
+    for (i = 0; i < data.length; i++) {
+        var currTweet = data[i];
+        if(users[currTweet.screen_name] == null) {
+            users[currTweet.screen_name] = {
+                userData: currTweet,
+                tweets: [currTweet.text]
+            }
+        }
+        else {
+            users[currTweet.screen_name].tweets.push(currTweet.text);
+        }
+    }
 
-console.log(sorted);
-    sorted = sorted.map(function(d){ d.value = +d.followers_count; return d; });
+    var compact = [];
+    var keys = Object.keys(users);
+    for (i = 0; i < keys.length; i++) {
+        var username = keys[i];
+        var currTweet = users[username];
+        compact.push({
+            screen_name: currTweet.userData.screen_name,
+            numOfTweets: currTweet.tweets.length,
+            tweetData: currTweet
+        })
+    }
+    compact = compact.sort(function(a, b){
+        return a.numOfTweets - b.numOfTweets;
+    });
+
+    return compact;
+}
+
+var initDataForViz = function(data) {
+
 	//setup the chart
     var bubbles = svg.append("g")
         .attr("transform", "translate(0,0)")
         .attr("id", "bubbleChart");
 
-    var randNumInit = Math.floor((Math.random() * 100) + 10);
-    generateBubbles2(sorted, randNumInit);
+    // var randNumInit = Math.floor((Math.random() * 100) + 10);
+    updateData(data);
 
-    //setup our ui
-    d3.select("#randomizeCount")
-        .on("click", function(d,i) {
-            var numOf = Math.floor((Math.random() * 100) + 10);
-            generateBubbles2(sorted, numOf);
-        })  
+    // //setup our ui
+    // d3.select("#randomizeCount")
+    //     .on("click", function(d,i) {
+    //         var numOf = Math.floor((Math.random() * 100) + 10);
+    //         generateBubbles2(sorted, numOf);
+    //     })  
 
 }
 
+var updateData = function(data) {
+    var sorted = sortTweetsByCount(data);
+    //var sorted = sortTweetsByFollowers(data);
+
+    sorted = sorted.map(function(d){ d.value = +d.numOfTweets; return d; });
+    generateBubbles2(sorted, 100);
+}
 
 var generateBubbles2 = function(nodeData, numOf) {
     //Cuts off the top "n" values off the sorted array
     var nodesToDisplay = nodeData.slice(-1 * numOf);
     var formattedNodes = bubble.nodes({children:nodesToDisplay}).filter(function(d) { return !d.children; });
-
+    console.log("Fomratted");
+    console.log(formattedNodes);
     var viz = svg.select("#bubbleChart").selectAll('.bubbleTweet').data(formattedNodes);
 
     var duration = 500;
@@ -98,10 +138,11 @@ var generateBubbles2 = function(nodeData, numOf) {
         .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
         .style("fill", function(d) { return color(d.value); })
         .on("mouseover", function(d) {
+            console.log(d.tweetData);
             tooltip.html("username: " + d.screen_name + "<br/>" + 
-                         "<img src=\"" + d.profile_image_url + "\" onError=\"this.src = '/static/img/defaultuser_small.png'\"></img>" + "<br/>" + 
-                         "followers: " + format(d.value) + "<br/>" + 
-                         "tweet hashtags: " + d.hashtaglist); 
+                         "<img src=\"" + d.tweetData.userData.profile_image_url + "\" onError=\"this.src = '/static/img/defaultuser_small.png'\"></img>" + "<br/>" + 
+                         "tweets: " + format(d.value) + "<br/>" + 
+                         "tweet hashtags: " + d.tweetData.userData.hashtaglist); 
             tooltip.style("visibility", "visible");
         })
         .on("mousemove", function() {
@@ -132,54 +173,6 @@ var generateBubbles2 = function(nodeData, numOf) {
         .duration(duration / 2)
         .style('opacity', 0)
         .remove();
-}
-
-var generateBubbles = function(nodes, numOf) {
-	//Cuts off the top "n" values off the sorted array
-	var nodesToDisplay = nodes.slice(-1 * numOf);
-	var formattedNodes = bubble.nodes({children:nodesToDisplay}).filter(function(d) { return !d.children; });
-
-    //First get the BUBBLE CHART <G>
-	var viz = d3.select("#bubbleChart");
-    //Then from the viz, get all bubble tweets
-    var bubbles = viz.selectAll(".bubbleTweet");
-
-    var updateSelection = bubbles.data(formattedNodes);
-    var enterSelection = updateSelection.enter();
-
-    var bubbleTweet = enterSelection.append("g").attr("class", "bubbleTweet");
-	//create the bubbles
-    bubbleTweet
-        .append("circle")
-        .attr("id", function(d, i) {return "bubble" + i})
-        .attr("r", function(d){ return d.r; })
-        .attr("cx", function(d){ return d.x; })
-        .attr("cy", function(d){ return d.y; })
-        .style("fill", function(d) { return color(d.value); })
-		.on("mouseover", function(d) {
-			tooltip.html("username: " + d.screen_name + "<br/>" + 
-						 "<img src=\"" + d.profile_image_url + "\" onError=\"this.src = '/static/img/defaultuser_small.png'\"></img>" + "<br/>" + 
-						 "followers: " + format(d.value) + "<br/>" + 
-						 "tweet hashtags: " + d.hashtaglist); 
-			tooltip.style("visibility", "visible");
-		})
-		.on("mousemove", function() {
-		  return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-		})
-		.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-    //format the text for each bubble
-    bubbleTweet
-        .append("text")
-        .attr("id", function(d, i) {return "text" + i})
-        .attr("x", function(d){ return d.x; })
-        .attr("y", function(d){ return d.y + 5; })
-        .attr("text-anchor", "middle")
-        .text(function(d){ return d.screen_name.substring(0, d.r / 3); })
-        .style({
-            "fill":"white", 
-            "font-family":"Helvetica Neue, Helvetica, Arial, san-serif",
-            "font-size": "12px"
-        });
 }
 
 d3.select(self.frameElement).style("height", diameter + "px");
