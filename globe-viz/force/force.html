@@ -1,0 +1,130 @@
+<!--
+  This is an example html file with some options added. The minimum html file for
+  the graph visualization is:
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Graph Visualization</title>
+      <script type="text/javascript" src="build/graph.min.js"></script>
+    </head>
+    <body onload="new Drawing.SimpleGraph({layout: '3d', showStats: true, showInfo: true})">
+    </bod>
+  </html>
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graph Visualization</title>
+
+    <script type="text/javascript" src="drawings/simple_graph.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"></script>
+    <script type="text/javascript" src="Graph.js"></script>
+    <script type="text/javascript" src="webgl-frameworks/three.min.js"></script>
+    <script type="text/javascript" src="utils/Stats.js"></script>
+    <script type="text/javascript" src="utils/TrackballControls.js"></script>
+    <script type="text/javascript" src="utils/Label.js"></script>
+    <script type="text/javascript" src="utils/ObjectSelection.js"></script>
+    <script type="text/javascript" src="layouts/force-directed-layout.js"></script>
+    <!-- Data loading -->
+
+    <script type="text/javascript">
+      var rawResults; //had to make a raw copy of the result because the var 'data' gets manipulated in initData();
+      var data = [];
+      var socket = io();
+      var date = new Date();
+      var initialized = false;
+
+      var drawing;
+
+      socket.emit('getLocations', date.toISOString());
+      socket.on('sendLocations', function(result) {
+        if(!initialized) {
+          rawResults = data = result;
+          init({layout: '3d', selection: true, numNodes: 50, showStats: true, showInfo: true, data: result});
+          initialized = true;
+        }
+      });
+      socket.on('refilterByDates', function(dates) {
+        /*
+          Note: Can be shortened to the snippet below if function calls wait for their parameters value to be resolve first before actually executing. otherwise promise is necessary lol.
+          initData(data.filter(function(row) {
+            return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+          }));
+         */
+        Promise.filter(rawResults, function(row) {
+          return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+        }).then(function(filteredData) {
+          //drawing = new Drawing.SimpleGraph({layout: '3d', selection: true, numNodes: 50, showStats: true, showInfo: true, data: filteredData});
+          appendTweets(filteredData);
+        });
+      });
+    </script>
+<!-- 
+    <script type="text/javascript">
+      var drawing;
+      function createDrawing() {
+        var index = parseInt(location.search.split("?")[1]);
+        if(isNaN(index)) {
+          index = 1;
+        }
+        /* Change these values to draw more nodes (numNodes) */
+        switch(index) {
+          case 0:
+            drawing = new Drawing.SimpleGraph({layout: '2d', selection: true, numNodes: 50, showStats: true, showInfo: true});
+            break;
+          case 1:
+            drawing = new Drawing.SimpleGraph({layout: '3d', selection: true, numNodes: 50, graphLayout:{attraction: 5, repulsion: 0.5}, showStats: true, showInfo: true});
+            break;
+          default:
+            drawing = new Drawing.SimpleGraph({layout: '3d', selection: true, numNodes: 50, showStats: true, showInfo: true});
+        }
+        document.getElementById("drawing_select").selectedIndex = index;
+      }
+    </script> -->
+
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        font: 11px courier;
+        overflow: hidden;
+      }
+      #graph-info {
+        position: absolute;
+        top: 0px;
+        left: 40%;
+        margin: 10px;
+        background-color: #ffffe0;
+        color: #333;
+        padding: 5px 10px;
+      }
+      #options {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="options">
+      <form>
+        <p>
+          <input type="checkbox" id="show_labels" onclick="toggleText(this.checked);">
+          <label for="show_labels">Show labels</label>
+        </p>
+        <p>
+          <input type="button" value="Stop layout" onclick="stop_calculating();">
+        </p>
+      </form>
+    </div>
+
+    <div style="position: absolute; bottom: 0;">
+      Rotate: Left Mouse Button and Move<br />
+      Zoom: Press Key S + Left Mouse Button and Move<br />
+      Drag: Press Key D + Left Mouse Button and Move
+    </div>
+  </body>
+</html>

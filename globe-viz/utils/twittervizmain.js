@@ -1,8 +1,8 @@
 
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = (window.innerWidth/4)*3 - margin.left - margin.right,
-    height = (window.innerHeight/4)*3 - margin.top - margin.bottom;
+    width = (window.innerWidth/6)*5 - margin.left - margin.right,
+    height = (window.innerHeight/6)*5 - margin.top - margin.bottom;
 
 // Parse the date / time
 var parseDate = d3.time.format("%Y-%m-%d").parse;
