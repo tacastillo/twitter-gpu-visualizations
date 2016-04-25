@@ -53,7 +53,7 @@ io.on('connection', function(socket) {
             connection.query(query, function(err, rows, fields) {
                 console.log(dateIncrement + ": " + rows.length);
                 dateIncrement.setDate(dateIncrement.getDate() + 1);
-                io.emit('sendLocations', err ? err: rows);
+                io.emit('sendDailyTweets', err ? err: rows);
             });
             setTimeout(dateExplosion, 2000);
         }
