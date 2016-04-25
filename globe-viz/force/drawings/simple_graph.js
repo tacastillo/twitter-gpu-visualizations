@@ -78,6 +78,8 @@
   var totalHashtagCount = 0;
   var addedNodes = [];
 
+  hashtagCombosByDate = {};
+
   // init();
   // //createGraph();
 
@@ -176,8 +178,7 @@
     //With each new tweet, create its hashtag combinations and add it to the original mapping.
     var tweets = newTweets;
 
-    //Currently, hashtagCombos has a SHITTON of keys. 1 possible method is to do a 
-    console.log("TOTAL NUMBER OF COMBOS: " + Object.keys(hashtagCombos).length);
+            }
     for(var i = 0; i < tweets.length; i++) {
       var currTweet = tweets[i];
       var hashtagsArray = currTweet.hashtaglist.split(" ");
@@ -216,7 +217,6 @@
     for(var key in hashtagCombos) {
       var hashCombo = hashtagCombos[key];
       //First, iterate through all existing hashCombos
-      if(hashCombo.count > 10) {
         if(popularHashtagsNodes[hashCombo.source] == null) {
           var nodeToAdd = new Node(totalHashtagCount);
           nodeToAdd.data.title = hashCombo.source;
@@ -248,31 +248,18 @@
       var combo = popularCombos[i];
       if(addedNodes.indexOf(combo.src) == -1) {
         addedNodes.push(combo.src);
-        graph.addNode(combo.srcNode);
-        drawNode(combo.srcNode);
       }
       if(addedNodes.indexOf(combo.dest) == -1) {
         addedNodes.push(combo.dest);
-        graph.addNode(combo.destNode);
-        drawNode(combo.destNode);
       }
 
-      graph.addEdge(combo.srcNode, combo.destNode);
-      drawEdge(combo.srcNode, combo.destNode);
     }
 
     if(initialized) {
-        //GLOBAL VARIABLES FOR DYNAMIC GRAPH
-      console.log(hashtagCombos)
-      console.log(popularCombos)
-      console.log(popularHashtagsNodes);
-      console.log("Total hashtags: " + totalHashtagCount);
-      console.log(addedNodes);
       graph.layout.updateGraph(graph);
       info_text.nodes = "Nodes " + graph.nodes.length;
       info_text.edges = "Edges " + graph.edges.length;
     }
-    //After that is done, go back to the mapping and see if any new edges/nodes have come up. 
   }
 
   function initGraphSettings() {
@@ -395,7 +382,6 @@
       scene.add( node.data.label_object );
     }
 
-    var area = 5000;
     draw_object.position.x = Math.floor(Math.random() * (area + area + 1) - area);
     draw_object.position.y = Math.floor(Math.random() * (area + area + 1) - area);
 
@@ -414,7 +400,6 @@
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target) {
-      material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, linewidth: 0.5 });
 
       var tmp_geo = new THREE.Geometry();
       tmp_geo.vertices.push(source.data.draw_object.position);
