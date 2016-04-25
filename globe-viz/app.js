@@ -14,20 +14,18 @@ var connection = mysql.createConnection({
 var dateStart = new Date(2016, 1, 19).toISOString();
 var dateFinish = new Date().toISOString();
 
+var dateIncrement = new Date(2016, 1, 19);
+var exploding = false;
+
 connection.connect();
 
 app.use(express.static('.'))
 
 io.on('connection', function(socket) {
     socket.on('getLocations', function(date) {
-        //connection.query('SELECT * from locationList_valid LIMIT 3000', function(err, rows, fields) {
-        // var dateFilter = "WHERE $date > '" + dateStart + "' AND $date < '" + dateFinish + "'";
         var query = 'SELECT * from tweet_with_lon_lat LIMIT 10000';
         console.log(query); 
         connection.query(query, function(err, rows, fields) {
-            // var json = rows.reduce(function(array, element) {
-            //     return array.concat([element.latitude,element.longitude, 1]);
-            // }, []);
             console.log(rows.length);
             io.emit('sendLocations', err ? err: rows);
         });
@@ -39,7 +37,39 @@ io.on('connection', function(socket) {
         var args = {dateStart: dateStart, dateFinish: dateFinish}
         io.emit('refilterByDates', args);
     });
+    socket.on('magicDateExplosion', function() {
+        var end = new Date();
+        if (!exploding) {
+            exploding = true;  
+            dateExplosion();
+        }
+        function dateExplosion() {
+            if (dateIncrement > end) {
+                exploding = false;
+                dateIncrement = new Date(2016, 1, 19);
+                return;
+            }
+            var query = "SELECT * from tweet_with_lon_lat WHERE date_simple='" + formatDate(dateIncrement) + "'";
+            connection.query(query, function(err, rows, fields) {
+                console.log(dateIncrement + ": " + rows.length);
+                dateIncrement.setDate(dateIncrement.getDate() + 1);
+                io.emit('sendLocations', err ? err: rows);
+            });
+            setTimeout(dateExplosion, 2000);
+        }
+    })
+
+
 });
+
+function formatDate(date) {
+    var result = "";
+    result = date.getFullYear() + "-";
+    result += (+date.getMonth() < 10 ? "0" : "") + (+date.getMonth()+1) + "-";
+    result += (+date.getDate() < 10 ? "0" : "") + date.getDate();
+    return result;
+}
+
 
 http.listen(8080, function() {
     console.log('listening on *:8080');

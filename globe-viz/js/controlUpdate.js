@@ -1,6 +1,7 @@
 var socket = io();
 var slider = document.getElementById('slider');
 var updateButton = document.getElementById('update');
+var magicButton = document.getElementById('magic');
 var sliderValues = {start: new Date(2016, 1, 19).getTime(), finish: new Date(2016,2,7) };
 var labels = [document.getElementById('min-label'), document.getElementById('max-label')];
 
@@ -25,6 +26,11 @@ updateButton.addEventListener("click", function() {
 	var args = {newStart: sliderValues["start"], newFinish: sliderValues["finish"]};
 	socket.emit('changeDate', args);
 });
+
+magicButton.addEventListener("click", function() {
+	console.log("clicked");
+	socket.emit('magicDateExplosion', {});
+})
 
 function timestamp(str){
     return new Date(str).getTime();   
