@@ -59,6 +59,18 @@
           appendTweets(filteredData);
         });
       });
+      socket.on('sendDailyTweets', function(tweets) {
+        if(!initialized) {
+          console.log(tweets.length);
+          rawResults = data = tweets;
+          console.log("initialized");
+          init({layout: '3d', selection: true, numNodes: 50, showStats: true, showInfo: true, data: tweets});
+          initialized = true;
+        } else {
+          console.log("appending");
+          appendTweets(tweets);
+        }
+      });
     </script>
 <!-- 
     <script type="text/javascript">
