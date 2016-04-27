@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
                 dateIncrement.setDate(dateIncrement.getDate() + 1);
                 io.emit('sendDailyTweets', err ? err: rows);
             });
-            setTimeout(dateExplosion, 5000);
+            setTimeout(dateExplosion, 1000);
         }
     })
 

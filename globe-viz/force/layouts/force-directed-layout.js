@@ -43,7 +43,7 @@ Layout.ForceDirected = function(graph, options) {
   
   this.layout = options.layout || "2d";
   this.attraction_multiplier = options.attraction || 10;
-  this.repulsion_multiplier = options.repulsion || 0.75;
+  this.repulsion_multiplier = options.repulsion || 0.50;
   this.max_iterations = options.iterations || 1000;
   this.graph = graph;
   this.width = options.width || 200;
@@ -74,6 +74,8 @@ Layout.ForceDirected = function(graph, options) {
     nodes_length = this.graph.nodes.length;
     edges_length = this.graph.edges.length;
     forceConstant = Math.sqrt(this.height * this.width / nodes_length);
+    attraction_constant = this.attraction_multiplier * forceConstant;
+    repulsion_constant = this.repulsion_multiplier * forceConstant;
   }
 
   /**
