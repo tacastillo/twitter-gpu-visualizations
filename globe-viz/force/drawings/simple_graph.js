@@ -164,21 +164,145 @@
       info.setAttributeNode(id_attr);
       document.body.appendChild( info );
     }
-    //initializeDynamicGraph();
+
     appendTweets(options.data);
     initGraphSettings();
     animate();
   }
 
-  this.clearTweets = function() {
+  this.splitByDate = function(tweets) {
+    var tweetsByDate = {};
+
+    for(var i = 0; i < tweets.length; i++) {
+      var currTweet = tweets[i];
+      var dateString = currTweet.$date;
+      dateString = dateString.slice(0, dateString.indexOf("T"));
+      var dateObj = new Date(dateString);
+      currTweet.dateObject = dateObj;
+
+      if(tweetsByDate[dateString] == null) {
+        tweetsByDate[dateString] = [currTweet];
+      }
+      else {
+        tweetsByDate[dateString].push(currTweet);
+      }
+    }
+
+    return tweetsByDate;
 
   }
-
+  //Current problem -- if we want to be able to append/remove, then we need to be ablle 
   this.appendTweets = function(newTweets) {
+
+    var tweetsByDate = splitByDate(newTweets);
     //With each new tweet, create its hashtag combinations and add it to the original mapping.
     var tweets = newTweets;
 
+    for(var tweetDate in tweetsByDate) {
+      var tweets = tweetsByDate[tweetDate];
+      //Should always trigger since hashtagCombosByDate is being generated new at this time
+      if(hashtagCombosByDate[tweetDate] == null) {
+        var hashtagCombos = {};
+        for(var i = 0; i < tweets.length; i++) {
+          var currTweet = tweets[i];
+          var hashtagsArray = currTweet.hashtaglist.split(" ");
+          currTweet.hashtagsArray = hashtagsArray;
+
+          for(var j = 0; j < hashtagsArray.length; j++) {
+            var currHashtag = hashtagsArray[j];
+            //If this hashtag is popular enough
+            for(var k = 0; k < hashtagsArray.length; k++) {
+              var nextHashTag = hashtagsArray[k];
+              if(currHashtag != nextHashTag) {
+                //Checks via alphabetical order(so double repeats dont show up)
+                if(currHashtag < nextHashTag) {
+                  var swap = currHashtag;
+                  currHashtag = nextHashTag;
+                  nextHashTag = swap;
+                }
+
+                var connection = currHashtag + "-" + nextHashTag;
+                //If indexOf == -1, then this connection was not found
+                if(hashtagCombos[connection] == null) {
+                  hashtagCombos[connection] = {
+                    combo: connection,
+                    count: 1,
+                    source: currHashtag,
+                    destination: nextHashTag
+                  }
+                } else {
+                  hashtagCombos[connection].count++;
+                }
+              }
             }
+          }
+        }
+
+
+        for(var key in hashtagCombos) {
+          var hashCombo = hashtagCombos[key];
+          //First, iterate through all existing hashCombos
+          if(hashCombo.count > 20) {
+            if(popularHashtagsNodes[hashCombo.source] == null) {
+              var nodeToAdd = new Node(totalHashtagCount);
+              nodeToAdd.data.title = hashCombo.source;
+              popularHashtagsNodes[hashCombo.source] = nodeToAdd;
+              totalHashtagCount++;
+            }
+            if(popularHashtagsNodes[hashCombo.destination] == null) {
+              var nodeToAdd = new Node(totalHashtagCount);
+              nodeToAdd.data.title = hashCombo.destination;
+              popularHashtagsNodes[hashCombo.destination] = nodeToAdd;
+              totalHashtagCount++;
+            }
+
+            var newCombo = {
+              combo: hashCombo.combo,
+              count: hashCombo.count,
+              src: hashCombo.source,
+              dest: hashCombo.destination,
+              srcNode: popularHashtagsNodes[hashCombo.source],
+              destNode: popularHashtagsNodes[hashCombo.destination]
+            }
+            if(popularCombos.indexOf(newCombo.combo) == -1) {
+              popularCombos.push(newCombo);
+            }
+          }
+        }
+
+        for(i = 0; i < popularCombos.length; i++) {
+          var combo = popularCombos[i];
+          if(addedNodes.indexOf(combo.src) == -1) {
+            addedNodes.push(combo.src);
+            if(graph.addNode(combo.srcNode)) {
+              drawNode(combo.srcNode);
+            }
+          }
+          if(addedNodes.indexOf(combo.dest) == -1) {
+            addedNodes.push(combo.dest);
+            if(graph.addNode(combo.destNode)) {
+              drawNode(combo.destNode);
+            }
+          }
+
+          if(graph.addEdge(combo.srcNode, combo.destNode)) {
+            drawEdge(combo.srcNode, combo.destNode);
+          }
+        }
+        //For every single day, we find the most popular hashtags and add them to the GLOBAL popular combos list. 
+        hashtagCombosByDate[tweetDate] = hashtagCombos; //ANOTHER DICTIONARY.
+      }
+    }
+    if(initialized) {
+      graph.layout.updateGraph(graph);
+      info_text.nodes = "Nodes " + graph.nodes.length;
+      info_text.edges = "Edges " + graph.edges.length;
+    }
+    //After that is done, go back to the mapping and see if any new edges/nodes have come up. 
+  }
+
+  this.generateAllTweetHashtags = function(tweets) {
+
     for(var i = 0; i < tweets.length; i++) {
       var currTweet = tweets[i];
       var hashtagsArray = currTweet.hashtaglist.split(" ");
@@ -217,6 +341,7 @@
     for(var key in hashtagCombos) {
       var hashCombo = hashtagCombos[key];
       //First, iterate through all existing hashCombos
+      if(hashCombo.count > 20) {
         if(popularHashtagsNodes[hashCombo.source] == null) {
           var nodeToAdd = new Node(totalHashtagCount);
           nodeToAdd.data.title = hashCombo.source;
@@ -248,11 +373,20 @@
       var combo = popularCombos[i];
       if(addedNodes.indexOf(combo.src) == -1) {
         addedNodes.push(combo.src);
+        if(graph.addNode(combo.srcNode)) {
+          drawNode(combo.srcNode);
+        }
       }
       if(addedNodes.indexOf(combo.dest) == -1) {
         addedNodes.push(combo.dest);
+        if(graph.addNode(combo.destNode)) {
+          drawNode(combo.destNode);
+        }
       }
 
+      if(graph.addEdge(combo.srcNode, combo.destNode)) {
+        drawEdge(combo.srcNode, combo.destNode);
+      }
     }
 
     if(initialized) {
@@ -382,6 +516,7 @@
       scene.add( node.data.label_object );
     }
 
+    var area = 10;
     draw_object.position.x = Math.floor(Math.random() * (area + area + 1) - area);
     draw_object.position.y = Math.floor(Math.random() * (area + area + 1) - area);
 
@@ -400,6 +535,7 @@
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target) {
+      material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, linewidth: 1.5 });
 
       var tmp_geo = new THREE.Geometry();
       tmp_geo.vertices.push(source.data.draw_object.position);

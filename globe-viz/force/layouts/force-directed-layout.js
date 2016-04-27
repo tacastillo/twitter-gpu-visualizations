@@ -66,9 +66,7 @@ Layout.ForceDirected = function(graph, options) {
   var mean_time = 0;
 
   this.updateGraph = function(graph) {
-    console.log("Updating Graph");
-    console.log(this.graph.nodes.length);
-    console.log(this.graph.edges.length);
+
     this.finished = false;
     temperature = this.width / 10.0;
     this.layout_iterations = 0;
