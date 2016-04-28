@@ -1,12 +1,12 @@
 {
-  "name": "test-visualization",
+  "name": "globe-viz",
   "version": "1.0.0",
   "description": "",
-  "git": "https://github.com/tacastillo/twitter-test-vis.git",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon"
+    "start": "nodemon app.js",
+    "run": "nodemon app.js"
   },
   "keywords": [],
   "author": "",

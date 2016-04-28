@@ -1,28 +1,77 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>d3 3d ThreeJS Visualization</title>
-    <script src='http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js'></script>
-    <script src='http://projects.delimited.io/experiments/d3-threejs/lib/tween.js'></script>
-    <script src='http://projects.delimited.io/experiments/d3-threejs/lib/CSS3DRenderer.js'></script>
-    <script src='http://projects.delimited.io/experiments/d3-threejs/lib/TrackballControls.js'></script>
-    <script src='http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js'></script>
-    <script src='https://cdn.rawgit.com/lodash/lodash/master/lodash.js'></script>
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <link rel="stylesheet" href="css/style.css">    
-  </head>
-
-  <body>
-  <div class="instructions">[Drag with mouse to move/rotate; right-drag to pan]</div>
-  <div id="container_JoEQyb"></div>
-  <script>
-    var socket = io();
-    socket.emit('coachella', "waddup");
-    socket.on('coachella', function(message) {
-      console.log(message);
-    })
-  </script>
-      <script src="js/treemapmain.js"></script>
-  </body>
+    <head>
+        <title>
+            Control Unit
+        </title>
+        <link href="css/nouislider.min.css" rel="stylesheet"/>
+        <style>
+        .centered {
+            width: 35vw;
+            margin: 0 auto;
+        }
+        .force-button {
+            margin-left: 2.5vw;
+        }
+        h1 {
+            font-size: 54px;
+            position: absolute;
+            left: 42vw;
+        }
+        button {
+            width: 128px;
+        }
+        #wrapper {
+         	position: absolute;
+         	left: 35vw;
+         	top: 35vh;
+         	width: 50vw;
+         }
+         #slider {
+         	width: 300px;
+         }
+         #update {
+         	height: 36px;
+         	position: relative;
+         	left: 10vw;
+         	top: 1vh;
+            margin-bottom: 50px;
+         }
+        #min-label {
+            padding-right: 95px;
+        }
+        #label-wrapper {
+            font-size: 14px;
+            font-weight: bold;
+            padding-bottom: 10px;
+        }
+        body {
+          font: 14px sans-serif;
+          color: white;
+          background: #000000;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>Kineviz</h1>
+        <div id="wrapper">
+        	<div id="slider-wrapper">
+                <div id="label-wrapper">
+                    <span id="min-label"></span>
+                    <span id="max-label"></span>
+                </div>
+        	    <div id="slider"></div>
+        	    <button id="update" type="button">Update</button>
+            </div>
+            <div class="centered">
+                <h3>Force-Directed Graph</h3>
+                <button class="force-button" id="magic">Add Tweets Daily</button> <br><br>
+                <p>Update every <input type="number" name="quantity" min="1" max="5"> seconds</p><br>
+                <button class="force-button" id="stop-magic">Stop Adding Tweets</button>
+            </div>
+        </div>
+        <script src="js/nouislider.min.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="js/controlUpdate.js"></script>
+    </body>
 </html>
