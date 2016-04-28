@@ -18,7 +18,7 @@ noUiSlider.create(slider, {
 slider.noUiSlider.on('update', function( values, handle ) {
 	sliderValues["start"] = new Date(+values[0]).toISOString();
 	sliderValues["finish"] = new Date(+values[1]).toISOString();
-	labels[handle].innerHTML = new Date(+values[handle]);
+	labels[handle].innerHTML = new Date(+values[handle]).toDateString();
 });
 
 updateButton.addEventListener("click", function() {
