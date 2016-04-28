@@ -45,10 +45,6 @@
   Feel free to contribute a new drawing!
 
  */
-
-// var Drawing = Drawing || {};
-
-// Drawing.SimpleGraph = function(options) {
   var initialized = false;
   var options;
 
@@ -79,9 +75,6 @@
   var addedNodes = [];
 
   hashtagCombosByDate = {};
-
-  // init();
-  // //createGraph();
 
 
   function init(inputOptions) {
@@ -191,7 +184,8 @@
     return tweetsByDate;
 
   }
-  //Current problem -- if we want to be able to append/remove, then we need to be ablle 
+
+
   this.appendTweets = function(newTweets) {
 
     var tweetsByDate = splitByDate(newTweets);
@@ -301,198 +295,11 @@
     //After that is done, go back to the mapping and see if any new edges/nodes have come up. 
   }
 
-  this.generateAllTweetHashtags = function(tweets) {
-
-    for(var i = 0; i < tweets.length; i++) {
-      var currTweet = tweets[i];
-      var hashtagsArray = currTweet.hashtaglist.split(" ");
-      currTweet.hashtagsArray = hashtagsArray;
-
-      for(var j = 0; j < hashtagsArray.length; j++) {
-        var currHashtag = hashtagsArray[j];
-        //If this hashtag is popular enough
-        for(var k = 0; k < hashtagsArray.length; k++) {
-          var nextHashTag = hashtagsArray[k];
-          if(currHashtag != nextHashTag) {
-            //Checks via alphabetical order(so double repeats dont show up)
-            if(currHashtag < nextHashTag) {
-              var swap = currHashtag;
-              currHashtag = nextHashTag;
-              nextHashTag = swap;
-            }
-
-            var connection = currHashtag + "-" + nextHashTag;
-            //If indexOf == -1, then this connection was not found
-            if(hashtagCombos[connection] == null) {
-              hashtagCombos[connection] = {
-                combo: connection,
-                count: 1,
-                source: currHashtag,
-                destination: nextHashTag
-              }
-            } else {
-              hashtagCombos[connection].count++;
-            }
-          }
-        }
-      }
-    }
-
-    for(var key in hashtagCombos) {
-      var hashCombo = hashtagCombos[key];
-      //First, iterate through all existing hashCombos
-      if(hashCombo.count > 20) {
-        if(popularHashtagsNodes[hashCombo.source] == null) {
-          var nodeToAdd = new Node(totalHashtagCount);
-          nodeToAdd.data.title = hashCombo.source;
-          popularHashtagsNodes[hashCombo.source] = nodeToAdd;
-          totalHashtagCount++;
-        }
-        if(popularHashtagsNodes[hashCombo.destination] == null) {
-          var nodeToAdd = new Node(totalHashtagCount);
-          nodeToAdd.data.title = hashCombo.destination;
-          popularHashtagsNodes[hashCombo.destination] = nodeToAdd;
-          totalHashtagCount++;
-        }
-
-        var newCombo = {
-          combo: hashCombo.combo,
-          count: hashCombo.count,
-          src: hashCombo.source,
-          dest: hashCombo.destination,
-          srcNode: popularHashtagsNodes[hashCombo.source],
-          destNode: popularHashtagsNodes[hashCombo.destination]
-        }
-        if(popularCombos.indexOf(newCombo.combo) == -1) {
-          popularCombos.push(newCombo);
-        }
-      }
-    }
-
-    for(i = 0; i < popularCombos.length; i++) {
-      var combo = popularCombos[i];
-      if(addedNodes.indexOf(combo.src) == -1) {
-        addedNodes.push(combo.src);
-        if(graph.addNode(combo.srcNode)) {
-          drawNode(combo.srcNode);
-        }
-      }
-      if(addedNodes.indexOf(combo.dest) == -1) {
-        addedNodes.push(combo.dest);
-        if(graph.addNode(combo.destNode)) {
-          drawNode(combo.destNode);
-        }
-      }
-
-      if(graph.addEdge(combo.srcNode, combo.destNode)) {
-        drawEdge(combo.srcNode, combo.destNode);
-      }
-    }
-
-    if(initialized) {
-      graph.layout.updateGraph(graph);
-      info_text.nodes = "Nodes " + graph.nodes.length;
-      info_text.edges = "Edges " + graph.edges.length;
-    }
-  }
-
   function initGraphSettings() {
     initialized = true;
     that.layout_options.width = that.layout_options.width || 2000;
     that.layout_options.height = that.layout_options.height || 2000;
-    that.layout_options.iterations = that.layout_options.iterations || 100000;
-    that.layout_options.layout = that.layout_options.layout || that.layout;
-    graph.layout = new Layout.ForceDirected(graph, that.layout_options);
-    graph.layout.init();
-    info_text.nodes = "Nodes " + graph.nodes.length;
-    info_text.edges = "Edges " + graph.edges.length;
-  }
-
-  function createGraphByAllHashtagCombinations() {
-    var tweets = that.data;
-    var hashtagNodes = {};
-    var popularHashtags = [];
-    var popularHashtagsNodes = {};
-    var edgedHashtags = [];
-    var totalHashtagCount = 0;
-
-    for(var i = 0; i < tweets.length; i++) {
-      var currTweet = tweets[i];
-      var hashtagsArray = currTweet.hashtaglist.split(" ");
-      currTweet.hashtagsArray = hashtagsArray;
-
-      for(var j = 0; j < hashtagsArray.length; j++) {
-        var currHashtag = hashtagsArray[j];
-        if(hashtagNodes[currHashtag] == null) {
-          var nodeToAdd = new Node(totalHashtagCount);
-          nodeToAdd.data.title = currHashtag;
-          hashtagNodes[currHashtag] = {
-            count: 1,
-            node: nodeToAdd
-          }
-          totalHashtagCount++;
-
-        }
-        else {
-          hashtagNodes[currHashtag].count++;
-
-        }
-      }
-    }
-
-    for(var key in hashtagNodes) {
-      var currNode = hashtagNodes[key];
-      if(currNode.count > 50) {
-        popularHashtags.push(key);
-        popularHashtagsNodes[key] = {
-          hashtag: key,
-          count: currNode.count,
-          node: currNode.node
-        };
-        graph.addNode(currNode.node);
-        drawNode(currNode.node);
-      }
-    }
-
-    for(var i = 0; i < tweets.length; i++) {
-      //Doubly nested for-loop to cross-compare all other hashtags to current one(by string, since people can hashtag the same thing together)
-      var hashtagsArray = tweets[i].hashtagsArray;
-      for(var j = 0; j < hashtagsArray.length; j++) {
-        var currHashtag = hashtagsArray[j];
-        //If this hashtag is popular enough
-        if(popularHashtags.indexOf(currHashtag) != -1) {
-          for(var k = 0; k < hashtagsArray.length; k++) {
-            var nextHashTag = hashtagsArray[k];
-            if((currHashtag != nextHashTag) && (popularHashtags.indexOf(nextHashTag) != -1)) { //Must not already exist AND be popular
-              //Checks via alphabetical order(so double repeats dont show up)
-              if(currHashtag < nextHashTag) {
-                var swap = currHashtag;
-                currHashtag = nextHashTag;
-                nextHashTag = swap;
-              }
-
-              var connection = currHashtag + "-" + nextHashTag;
-              //If indexOf == -1, then this connection was not found
-              if(edgedHashtags.indexOf(connection) == -1) {
-                edgedHashtags.push(connection);
-                var currNode = popularHashtagsNodes[currHashtag].node;
-                var nextNode = popularHashtagsNodes[nextHashTag].node;
-
-                graph.addEdge(currNode, nextNode);
-                drawEdge(currNode, nextNode);
-              }
-            }
-          }
-        }
-        else {
-          continue;
-        }
-      }
-    }
-
-    that.layout_options.width = that.layout_options.width || 2000;
-    that.layout_options.height = that.layout_options.height || 2000;
-    that.layout_options.iterations = that.layout_options.iterations || 100000;
+    that.layout_options.iterations = 1000000;
     that.layout_options.layout = that.layout_options.layout || that.layout;
     graph.layout = new Layout.ForceDirected(graph, that.layout_options);
     graph.layout.init();
@@ -586,7 +393,8 @@
           node.data.label_object.position.x = node.data.draw_object.position.x;
           node.data.label_object.position.y = node.data.draw_object.position.y - 100;
           node.data.label_object.position.z = node.data.draw_object.position.z;
-          node.data.label_object.lookAt(camera.position);
+          //node.data.label_object.lookAt(camera.position);
+          node.data.label_object.quaternion.copy(camera.quaternion);
         } else {
           if(node.data.title != undefined) {
             var label_object = new THREE.Label(node.data.title, node.data.draw_object);
@@ -649,4 +457,3 @@
   this.toggleText = function(checked) {
     that.show_labels = checked;
   }
-//}
