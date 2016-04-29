@@ -14,7 +14,6 @@ var connection = mysql.createConnection({
 var dateStart = new Date(2016, 1, 19).toISOString();
 var dateFinish = new Date().toISOString();
 
-var dateIncrement = new Date(2016, 1, 19);
 var exploding = false;
 
 connection.connect();
@@ -37,27 +36,35 @@ io.on('connection', function(socket) {
         var args = {dateStart: dateStart, dateFinish: dateFinish}
         io.emit('refilterByDates', args);
     });
-    socket.on('magicDateExplosion', function() {
-        var end = new Date();
+    socket.on('magicDateExplosion', function(dates) {
+        var dateIncrement, end;
         if (!exploding) {
-            exploding = true;  
+            exploding = true; 
+            console.log("DATES: ", dates);
+            dateIncrement = new Date(dates["start"]);
+            end = new Date(dates["finish"]);
             dateExplosion();
         }
         function dateExplosion() {
-            if (dateIncrement > end) {
+            if (dateIncrement >= end || !exploding) {
                 exploding = false;
-                dateIncrement = new Date(2016, 1, 19);
+                dateIncrement = new Date(dates["start"]);
+                end = new Date(dates["finish"]);
                 return;
+            } else {
+                var query = "SELECT * from tweet_with_lon_lat WHERE date_simple='" + formatDate(dateIncrement) + "'";
+                connection.query(query, function(err, rows, fields) {
+                    console.log(dateIncrement + ": " + rows.length);
+                    dateIncrement.setDate(dateIncrement.getDate() + 1);
+                    io.emit('sendDailyTweets', err ? err: rows);
+                });
+                setTimeout(dateExplosion, dates["interval"]*1000);
             }
-            var query = "SELECT * from tweet_with_lon_lat WHERE date_simple='" + formatDate(dateIncrement) + "'";
-            connection.query(query, function(err, rows, fields) {
-                console.log(dateIncrement + ": " + rows.length);
-                dateIncrement.setDate(dateIncrement.getDate() + 1);
-                io.emit('sendDailyTweets', err ? err: rows);
-            });
-            setTimeout(dateExplosion, 1000);
         }
     })
+    socket.on('stopExplosion', function() {
+        exploding = false;
+    });
 
 
 });
