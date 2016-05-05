@@ -1,0 +1,22 @@
+body {
+    color: white;
+    background: black;
+}
+#update {
+    position: relative;
+    margin-top: 16px;
+    height: 36px;
+    left: 16vw;
+}
+#label-wrapper {
+    font-size: 14px;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+#intervals {
+    max-width: 24px;
+}
+#slider-wrapper {
+    margin-top: 100px;
+}

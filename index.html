@@ -4,70 +4,36 @@
         <title>
             Control Unit
         </title>
-        <link href="css/nouislider.min.css" rel="stylesheet"/>
-        <style>
-        .centered {
-            width: 35vw;
-            margin: 0 auto;
-        }
-        .force-button {
-            margin-left: 2.5vw;
-        }
-        h1 {
-            font-size: 54px;
-            position: absolute;
-            left: 42vw;
-        }
-        button {
-            width: 128px;
-        }
-        #wrapper {
-         	position: absolute;
-         	left: 35vw;
-         	top: 35vh;
-         	width: 50vw;
-         }
-         #slider {
-         	width: 300px;
-         }
-         #update {
-         	height: 36px;
-         	position: relative;
-         	left: 10vw;
-         	top: 1vh;
-            margin-bottom: 50px;
-         }
-        #min-label {
-            padding-right: 95px;
-        }
-        #label-wrapper {
-            font-size: 14px;
-            font-weight: bold;
-            padding-bottom: 10px;
-        }
-        body {
-          font: 14px sans-serif;
-          color: white;
-          background: #000000;
-        }
-        </style>
+		<link href="css/nouislider.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+
+        <link href="css/control-style.css" rel="stylesheet"/>
     </head>
     <body>
-        <h1>Kineviz</h1>
-        <div id="wrapper">
-        	<div id="slider-wrapper">
-                <div id="label-wrapper">
-                    <span id="min-label"></span>
-                    <span id="max-label"></span>
-                </div>
-        	    <div id="slider"></div>
-        	    <button id="update" type="button">Update</button>
+        <nav>
+            <div class="teal nav-wrapper">
+	            <a href="#" class="brand-logo center">Kineviz GPU Processing Control Unit</a>
             </div>
-            <div class="centered">
-                <h3>Force-Directed Graph</h3>
-                <button class="force-button" id="magic">Add Tweets Daily</button> <br><br>
-                <p>Update every <input id="intervals" value="3" type="number" name="quantity" min="1" max="5"> seconds</p><br>
-                <button class="force-button" id="stop-magic">Stop Adding Tweets</button>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col s8 offset-s2" id="slider-wrapper">
+                        <div id="label-wrapper">
+                            <span class="left" id="min-label"></span>
+                            <span class="right"id="max-label"></span>
+                        </div>
+                        <div class="white" id="slider"></div>
+                    <a class="col s2 offset-s1 waves-effect waves-light btn" id="update">Update</a>
+                </div>
+            </div>
+            <br><br><br><br><br><br>
+            <h4 class="center">Force-Directed Graph</h3>
+            <div class="row">
+                <a class="col s2 offset-s1 waves-effect waves-light btn" id="magic">Add Tweets</a>
+                <span class="col s4 offset-s2"> Update every <input id="intervals" value="3" type="number" name="quantity" min="1" max="5"> seconds </span>
+                <a class="col s2 waves-effect waves-light btn" id="stop-magic">Stop Adding</a>
             </div>
         </div>
         <script src="js/nouislider.min.js"></script>
