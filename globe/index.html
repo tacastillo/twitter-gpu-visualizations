@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>WebGL Globe</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="static/css/globe.css">
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"></script>
+</head>
+<body>
+    <div id="globeContainer"></div>
+
+    <div id="info">
+      <strong>Original by <a href="http://simia.net/wikiglobe/">Denny Vrandecic</a></strong>
+      <span class="bull">&bull;</span>
+      Based on <a href="http://code.google.com/p/webgl-globe/">WebGL Globe</a>,
+      <a href="http://www.wikidata.org">Wikidata</a> and
+      <a href="http://dbpedia.org">DBpedia</a>
+    </div>
+
+    <div id="title">
+      <span style="font-size:200%">Twitter Globe</span>
+      <br>
+      &nbsp;
+      <br>
+      <table id="navigationTable">
+       <tr>
+        <td> </td>
+        <td style="font-size:60%;text-align:center">&larr; speed / detail &rarr;</td>
+       </tr>
+      </table>
+      <br>
+      <span style="font-size:120%"> Controls </span>
+      <div id="controlMenu" class="controlMenu">
+        <button type="button" onclick="toggleAutomaticTimer()"> Turn On/Off Auto-Timer </button>
+      </div>
+      &nbsp;
+      <br>
+      <span id="load"> </span>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!-- WebGL/Three Globe frameworks -->
+    <script type="text/javascript" src="static/js/Three/three.min.js"></script>
+    <script type="text/javascript" src="static/js/Three/ThreeWebGL.js"></script>
+    <script type="text/javascript" src="static/js/Three/ThreeExtras.js"></script>
+    <script type="text/javascript" src="static/js/Three/RequestAnimationFrame.js"></script>
+    <script type="text/javascript" src="static/js/Three/Detector.js"></script>
+    <script type="text/javascript" src="static/js/globe.js"></script>
+	<!-- Main body script for instancing globe & data loading -->
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript">
+      var rawResults; //had to make a raw copy of the result because the var 'data' gets manipulated in initData();
+      var data = [];
+      var socket = io();
+      var date = new Date();
+      var initialized = false;
+
+      socket.emit('getLocations', date.toISOString());
+      socket.on('sendLocations', function(result) {
+        if(!initialized) {
+          rawResults = data = result;
+          console.log(data);
+          initData(result);
+          initialized = true;
+        }
+      });
+      socket.on('refilterByDates', function(dates) {
+        /*
+          Note: Can be shortened to the snippet below if function calls wait for their parameters value to be resolve first before actually executing. otherwise promise is necessary lol.
+          initData(data.filter(function(row) {
+            return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+          }));
+         */
+        Promise.filter(rawResults, function(row) {
+          return row["$date"] > dates["dateStart"] && row["$date"] < dates["dateFinish"];
+        }).then(function(filteredData) {
+          changeDataSet(filteredData);
+        });
+      });
+    </script>
+</body>
+</html>
