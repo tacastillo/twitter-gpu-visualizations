@@ -1,0 +1,112 @@
+<!--
+  This is an example html file with some options added. The minimum html file for
+  the graph visualization is:
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Graph Visualization</title>
+      <script type="text/javascript" src="build/graph.min.js"></script>
+    </head>
+    <body onload="new Drawing.SimpleGraph({layout: '3d', showStats: true, showInfo: true})">
+    </bod>
+  </html>
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graph Visualization</title>
+    <script src="lib/lodash.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="js/Graph.js"></script>
+    <script type="text/javascript" src="lib/three.js"></script>
+    <script type="text/javascript" src="lib/Stats.js"></script>
+    <script type="text/javascript" src="lib/TrackballControls.js"></script>
+    <script type="text/javascript" src="lib/Label.js"></script>
+    <!-- <script type="text/javascript" src="lib/ObjectSelection.js"></script> -->
+    <script type="text/javascript" src="js/force-directed-layout.js"></script>
+    <script type="text/javascript" src="js/simple_graph.js"></script>
+    <script type="text/javascript" src="js/sphere_graph.js"></script>
+    <script type="text/javascript" src="js/graph_Drawing.js"></script>
+
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        font: 11px courier;
+        overflow: hidden;
+      }
+      #graph-info {
+        position: absolute;
+        top: 0px;
+        left: 40%;
+        margin: 10px;
+        background-color: #ffffe0;
+        color: #333;
+        padding: 5px 10px;
+      }
+      #options {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body onload="createDrawing()">
+    <div id="options">
+      <form>
+        <p>
+          <label>Drawing</label><br>
+          <select id="drawing_select" onchange="window.location.href = '?' + this.selectedIndex;">
+            <option>2D-Force-Directed</option>
+            <option selected="selected">3D-Force-Directed</option>
+            <option>Sphere Graph</option>
+          </select>
+        </p>
+        <p>
+          <input type="checkbox" id="show_labels" onclick="drawing.show_labels = this.checked;">
+          <label for="show_labels">Show labels</label>
+        </p>
+        <p>
+          <input type="button" value="Stop layout" onclick="drawing.stop_calculating();">
+        </p>
+        <p>
+          <input type="button" value="Use gpu" onclick="drawing.stop_calculating(); layoutTest();">
+        </p>
+        <p>
+          <input type="button" value="Clear Graph" onclick="drawing.stop_calculating(); clearGraph(); layoutTest();">
+        </p>
+      </form>
+    </div>
+
+    <div style="position: absolute; bottom: 0;">
+      Rotate: Left Mouse Button and Move<br />
+      Zoom: Press Key S + Left Mouse Button and Move<br />
+      Drag: Press Key D + Left Mouse Button and Move
+    </div>
+  </body>
+  
+  <script type="x-shader/x-vertex" id="vertexshader">
+      attribute float size;
+      attribute vec3 customColor;
+      varying vec3 vColor;
+      void main() {
+        vColor = customColor;
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        gl_PointSize = size * ( 300.0 / -mvPosition.z );
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentshader">
+      uniform vec3 color;
+      uniform sampler2D texture;
+      varying vec3 vColor;
+      void main() {
+        gl_FragColor = vec4( color * vColor, 1.0 );
+        gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+        if ( gl_FragColor.a < ALPHATEST ) discard;
+      }
+    </script>
+</html>

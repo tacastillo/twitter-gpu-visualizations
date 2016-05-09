@@ -1,0 +1,21 @@
+{
+  "name": "cljs",
+  "private": false,
+  "version": "0.0.1",
+  "description": "Convenience library build on top of node-opencl",
+  "main": "src/cl.js",
+  "author": "",
+  "scripts": {
+    "test": "./tests/add.js"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "bunyan": "~1.5.1",
+    "debug": "~2.2.0",
+    "lodash": "^4.11.0",
+    "node-opencl": "mikeseven/node-opencl",
+    "q": "~1.4.1",
+    "sprintf-js": "~1.0.3",
+    "underscore": "~1.8.0"
+  }
+}
